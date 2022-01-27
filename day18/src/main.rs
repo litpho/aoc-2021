@@ -9,7 +9,6 @@ use std::{
     fmt::{Display, Formatter},
     fs,
     io::Read,
-    str::FromStr,
     time::Instant,
 };
 
@@ -225,8 +224,8 @@ fn parse_value(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Number>> {
     move |input: &str| {
         alt((
             parse_tuple(depth + 1),
-            map(digit1, |num| {
-                vec![Number::new(i16::from_str(num).unwrap(), depth)]
+            map(digit1, |num: &str| {
+                vec![Number::new(num.parse().unwrap(), depth)]
             }),
         ))(input)
     }

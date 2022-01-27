@@ -4,7 +4,7 @@ use nom::{
     bytes::complete::tag, character::complete::digit1, combinator::map, multi::separated_list1,
     IResult,
 };
-use std::{fs, io::Read, str::FromStr, time::Instant};
+use std::{fs, io::Read, time::Instant};
 
 fn main() -> Result<()> {
     let start = Instant::now();
@@ -68,7 +68,7 @@ fn parse(input: &str) -> IResult<&str, Vec<i32>> {
     map(separated_list1(tag(","), digit1), |numbers| {
         numbers
             .into_iter()
-            .map(|num| i32::from_str(num).unwrap())
+            .map(|num: &str| num.parse().unwrap())
             .collect::<Vec<i32>>()
     })(input)
 }

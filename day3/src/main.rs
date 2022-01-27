@@ -61,7 +61,7 @@ fn get_row_as_decimal(input: &[Vec<char>], function: fn(&[Vec<char>], usize) -> 
 // TODO ownership of input
 fn get_single_row(input: Vec<Vec<char>>, function: fn(&[Vec<char>], usize) -> char) -> isize {
     let mut input = input;
-    for column in (0..input[0].len()).into_iter() {
+    for column in 0..input[0].len() {
         let filter_value = function(&input, column);
         input.retain(|x| x[column] == filter_value);
         if input.len() == 1 {
