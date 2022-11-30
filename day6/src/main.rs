@@ -3,29 +3,18 @@ use nom::{
     bytes::complete::tag, character::complete::digit1, combinator::map, multi::separated_list1,
     IResult,
 };
-use std::{collections::HashMap, fs, io::Read, time::Instant};
+use std::{collections::HashMap, fs, io::Read};
 
 fn main() -> Result<()> {
-    let start = Instant::now();
     let input = read_input()?;
-    let count = part_one(input);
-    println!("Part one count: {}", count);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        lap.duration_since(start).as_micros()
-    );
+    let (took, result) = took::took(|| part_one(input.clone()));
+    println!("Result part one: {}", result);
+    println!("Time spent: {}", took);
 
-    let input = read_input()?;
-    let count = part_two(input);
-    println!("Part two count: {}", count);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        end.duration_since(lap).as_micros()
-    );
+    let (took, result) = took::took(|| part_two(input));
+    println!("Result part two: {}", result);
+    println!("Time spent: {}", took);
 
     Ok(())
 }
@@ -43,7 +32,7 @@ fn algorithm(mut input: HashMap<i8, i64>, days: i16) -> i64 {
         let mut new_borns = 0;
         let mut reset_fish = 0;
         for fish in 0..=8 {
-            let number = *input.get(&fish).or(Some(&0)).unwrap();
+            let number = *input.get(&fish).unwrap_or(&0);
             if fish == 0 {
                 new_borns = number;
                 reset_fish = number;

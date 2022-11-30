@@ -5,29 +5,18 @@ use nom::{
     multi::separated_list1,
     IResult,
 };
-use std::{fs, io::Read, time::Instant};
+use std::{fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
 
-    let start = Instant::now();
-    let count = part_one(&input);
-    println!("Count part one: {}", count);
+    let (took, result) = took::took(|| part_one(&input));
+    println!("Result part one: {}", result);
+    println!("Time spent: {}", took);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        lap.duration_since(start).as_micros()
-    );
-
-    let count = part_two(&input);
-    println!("Count part two: {}", count);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        end.duration_since(lap).as_micros()
-    );
+    let (took, result) = took::took(|| part_two(&input));
+    println!("Result part two: {}", result);
+    println!("Time spent: {}", took);
 
     Ok(())
 }

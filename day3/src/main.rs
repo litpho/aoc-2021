@@ -5,33 +5,22 @@ use nom::{
     multi::{count, separated_list1},
     IResult,
 };
-use std::{cmp::Ordering, collections::HashMap, fs, io::Read, time::Instant};
+use std::{cmp::Ordering, collections::HashMap, fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
-    let start = Instant::now();
 
-    let (gamma, epsilon) = part_one(&input);
+    let (took, (gamma, epsilon)) = took::took(|| part_one(&input));
     println!("Gamma: {}", gamma);
     println!("Epsilon: {}", epsilon);
-    println!("Part one result: {}", gamma * epsilon);
+    println!("Result part one: {}", gamma * epsilon);
+    println!("Time spent: {}", took);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        lap.duration_since(start).as_micros()
-    );
-
-    let (oxygen, co2) = part_two(input);
+    let (took, (oxygen, co2)) = took::took(|| part_two(input));
     println!("Oxygen: {}", oxygen);
     println!("CO2: {}", co2);
-    println!("Part two result: {}", oxygen * co2);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        end.duration_since(lap).as_micros()
-    );
+    println!("Result part two: {}", oxygen * co2);
+    println!("Time spent: {}", took);
 
     Ok(())
 }

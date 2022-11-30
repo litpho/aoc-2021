@@ -8,30 +8,29 @@ use nom::{
     sequence::{separated_pair, terminated},
     IResult,
 };
-use std::{collections::HashMap, fs, io::Read, ops::Rem, time::Instant};
+use std::{collections::HashMap, fs, io::Read, ops::Rem};
 
 fn main() -> Result<()> {
-    let start = Instant::now();
     let (called_numbers, mut cards) = read_input()?;
-    let (called_number, card) = part_one(&called_numbers, &mut cards).unwrap();
 
-    let card_sum = card.sum();
+    let (took, (called_number, card_sum)) = took::took(|| {
+        let mut cards = cards.clone();
+        let (called_numbers, card) = part_one(&called_numbers, &mut cards).unwrap();
+        (called_numbers, card.sum())
+    });
     println!("called_number: {}", called_number);
     println!("Sum: {}", card_sum);
-    println!("Result: {}", (called_number as u32) * card_sum);
+    println!("Result part one: {}", (called_number as u32) * card_sum);
+    println!("Time spent: {}", took);
 
-    let lap = Instant::now();
-    println!("Time spent: {}ms", lap.duration_since(start).as_millis());
-
-    let (called_numbers, mut cards) = read_input()?;
-    let (called_number, card) = part_two(&called_numbers, &mut cards).unwrap();
-    let card_sum = card.sum();
+    let (took, (called_number, card_sum)) = took::took(|| {
+        let (called_number, card) = part_two(&called_numbers, &mut cards).unwrap();
+        (called_number, card.sum())
+    });
     println!("called_number: {}", called_number);
     println!("Sum: {}", card_sum);
-    println!("Result: {}", (called_number as u32) * card_sum);
-
-    let end = Instant::now();
-    println!("Time spent: {}ms", end.duration_since(lap).as_millis());
+    println!("Result part two: {}", (called_number as u32) * card_sum);
+    println!("Time spent: {}", took);
 
     Ok(())
 }

@@ -8,7 +8,7 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
-use std::{cmp::Reverse, collections::HashMap, fs, io::Read, time::Instant};
+use std::{cmp::Reverse, collections::HashMap, fs, io::Read};
 
 lazy_static! {
     static ref BYTEMAP: HashMap<char, u8> = {
@@ -25,26 +25,15 @@ lazy_static! {
 }
 
 fn main() -> Result<()> {
-    let start = Instant::now();
-    let input = read_input()?;
-    let count = part_one(&input);
-    println!("Part one count: {}", count);
-
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        lap.duration_since(start).as_micros()
-    );
-
     let mut input = read_input()?;
-    let count = part_two(&mut input);
-    println!("Part two count: {}", count);
 
-    let end = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        end.duration_since(lap).as_millis()
-    );
+    let (took, result) = took::took(|| part_one(&input));
+    println!("Result part one: {}", result);
+    println!("Time spent: {}", took);
+
+    let (took, result) = took::took(|| part_two(&mut input));
+    println!("Result part two: {}", result);
+    println!("Time spent: {}", took);
 
     Ok(())
 }

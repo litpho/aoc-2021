@@ -9,29 +9,18 @@ use nom::{
     sequence::{separated_pair, terminated},
     IResult,
 };
-use std::{fs, io::Read, time::Instant};
+use std::{fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
-    let start = Instant::now();
 
-    let (x, depth) = part_one(&input);
-    println!("Part one: {} / {} = {}", x, depth, x * depth);
+    let (took, (x, depth)) = took::took(|| part_one(&input));
+    println!("Result part one: {} / {} = {}", x, depth, x * depth);
+    println!("Time spent: {}", took);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        lap.duration_since(start).as_micros()
-    );
-
-    let (x, depth) = part_two(&input);
-    println!("Part two: {} / {} = {}", x, depth, x * depth);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} microseconds",
-        end.duration_since(lap).as_micros()
-    );
+    let (took, (x, depth)) = took::took(|| part_two(&input));
+    println!("Result part two: {} / {} = {}", x, depth, x * depth);
+    println!("Time spent: {}", took);
 
     Ok(())
 }

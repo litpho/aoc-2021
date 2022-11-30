@@ -8,29 +8,18 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
-use std::{collections::HashMap, fs, io::Read, time::Instant};
+use std::{collections::HashMap, fs, io::Read};
 
 fn main() -> Result<()> {
-    let start = Instant::now();
     let (template, rules) = read_input()?;
-    let count = part_one(template, &rules);
-    println!("Part one count: {}", count);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        lap.duration_since(start).as_millis()
-    );
+    let (took, result) = took::took(|| part_one(template.clone(), &rules));
+    println!("Result part one: {}", result);
+    println!("Time spent: {}", took);
 
-    let (template, rules) = read_input()?;
-    let count = part_two(template, &rules);
-    println!("Part two count: {}", count);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        end.duration_since(lap).as_millis()
-    );
+    let (took, result) = took::took(|| part_two(template, &rules));
+    println!("Result part two: {}", result);
+    println!("Time spent: {}", took);
 
     Ok(())
 }

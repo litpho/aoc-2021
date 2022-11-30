@@ -10,29 +10,18 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
-use std::{cmp::Ordering, collections::HashSet, fs, io::Read, str::FromStr, time::Instant};
+use std::{cmp::Ordering, collections::HashSet, fs, io::Read, str::FromStr};
 
 fn main() -> Result<()> {
-    let start = Instant::now();
     let (grid, instructions) = read_input()?;
-    let count = part_one(grid, instructions);
-    println!("Part one count: {}", count);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        lap.duration_since(start).as_millis()
-    );
+    let (took, result) = took::took(|| part_one(grid.clone(), instructions.clone()));
+    println!("Result part one: {}", result);
+    println!("Time spent: {}", took);
 
-    let (grid, instructions) = read_input()?;
-    let count = part_two(grid, instructions);
-    println!("Part two count: {}", count);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        end.duration_since(lap).as_millis()
-    );
+    let (took, result) = took::took(|| part_two(grid, instructions));
+    println!("Result part two: {}", result);
+    println!("Time spent: {}", took);
 
     Ok(())
 }
@@ -53,6 +42,7 @@ fn part_two(grid: Grid, instructions: Vec<Instruction>) -> usize {
     grid.dots.len()
 }
 
+#[derive(Clone)]
 struct Grid {
     dots: HashSet<(i16, i16)>,
 }
@@ -99,13 +89,13 @@ impl Grid {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 enum Direction {
     X,
     Y,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 struct Instruction {
     direction: Direction,
     location: i16,

@@ -12,24 +12,18 @@ use std::{
     fs,
     io::Read,
     str::FromStr,
-    time::Instant,
 };
 
 fn main() -> Result<()> {
     let lines = read_input()?;
-    let start = Instant::now();
 
-    let count = part_one(&lines);
-    println!("Part one count: {}", count);
+    let (took, result) = took::took(|| part_one(&lines));
+    println!("Result part one: {}", result);
+    println!("Time spent: {}", took);
 
-    let lap = Instant::now();
-    println!("Time spent: {}ms", lap.duration_since(start).as_millis());
-
-    let count = part_two(&lines);
-    println!("Part two count: {}", count);
-
-    let end = Instant::now();
-    println!("Time spent: {}ms", end.duration_since(lap).as_millis());
+    let (took, result) = took::took(|| part_two(&lines));
+    println!("Result part two: {}", result);
+    println!("Time spent: {}", took);
 
     Ok(())
 }

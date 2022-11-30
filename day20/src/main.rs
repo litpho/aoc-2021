@@ -8,29 +8,18 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
-use std::{collections::HashSet, fs, io::Read, time::Instant};
+use std::{collections::HashSet, fs, io::Read};
 
 fn main() -> Result<()> {
-    let start = Instant::now();
     let (key, grid) = read_input()?;
-    let result = part_one(key, grid);
-    println!("Part one result: {}", result);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        lap.duration_since(start).as_millis()
-    );
+    let (took, result) = took::took(|| part_one(key.clone(), grid.clone()));
+    println!("Result part one: {}", result);
+    println!("Time spent: {}", took);
 
-    let (key, grid) = read_input()?;
-    let result = part_two(key, grid);
-    println!("Part two result: {}", result);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        end.duration_since(lap).as_millis()
-    );
+    let (took, result) = took::took(|| part_two(key, grid));
+    println!("Result part two: {}", result);
+    println!("Time spent: {}", took);
 
     Ok(())
 }
@@ -51,6 +40,7 @@ fn part_two(key: Vec<bool>, mut grid: Grid) -> usize {
     grid.pixels.len()
 }
 
+#[derive(Clone)]
 struct Grid {
     pixels: HashSet<(isize, isize)>,
     max_x: isize,

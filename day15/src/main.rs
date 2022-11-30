@@ -4,30 +4,18 @@ use nom::{
     bytes::complete::take_while1, character::complete::line_ending, character::is_digit,
     combinator::map, multi::separated_list1, IResult,
 };
-use std::{fs, io::Read, time::Instant};
+use std::{fs, io::Read};
 
 fn main() -> Result<()> {
-    let start = Instant::now();
     let input = read_input()?;
-    // let result = part_one(&input);
-    let result = part_one_lib(&input);
-    println!("Part one count: {}", result);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        lap.duration_since(start).as_millis()
-    );
+    let (took, result) = took::took(|| part_one_lib(&input));
+    println!("Result part one: {}", result);
+    println!("Time spent: {}", took);
 
-    let input = read_input()?;
-    let count = part_two_lib(&input);
-    println!("Part two count: {}", count);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        end.duration_since(lap).as_millis()
-    );
+    let (took, result) = took::took(|| part_two_lib(&input));
+    println!("Result part two: {}", result);
+    println!("Time spent: {}", took);
 
     Ok(())
 }

@@ -4,29 +4,18 @@ use nom::{
     bytes::complete::tag, character::complete::digit1, combinator::map, multi::separated_list1,
     IResult,
 };
-use std::{fs, io::Read, time::Instant};
+use std::{fs, io::Read};
 
 fn main() -> Result<()> {
-    let start = Instant::now();
     let input = read_input()?;
-    let (position, fuel_spent) = part_one(input);
-    println!("Part one: {} - {}", position, fuel_spent);
 
-    let lap = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        lap.duration_since(start).as_millis()
-    );
+    let (took, (position, fuel_spent)) = took::took(|| part_one(input.clone()));
+    println!("Result part one: {} - {}", position, fuel_spent);
+    println!("Time spent: {}", took);
 
-    let input = read_input()?;
-    let (position, fuel_spent) = part_two(input);
-    println!("Part two: {} - {}", position, fuel_spent);
-
-    let end = Instant::now();
-    println!(
-        "Time spent: {} milliseconds",
-        end.duration_since(lap).as_millis()
-    );
+    let (took, (position, fuel_spent)) = took::took(|| part_two(input));
+    println!("Result part two: {} - {}", position, fuel_spent);
+    println!("Time spent: {}", took);
 
     Ok(())
 }
