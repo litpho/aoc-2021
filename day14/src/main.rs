@@ -57,7 +57,7 @@ fn initialize_input(template: &str) -> HashMap<(char, char), i64> {
         .chars()
         .collect::<Vec<char>>()
         .windows(2)
-        .map(|a| (*a.get(0).unwrap(), *a.get(1).unwrap()))
+        .map(|a| (*a.first().unwrap(), *a.get(1).unwrap()))
         .for_each(|c| {
             *input.entry(c).or_insert(0) += 1;
         });
@@ -114,8 +114,8 @@ fn parse_insertion_rules(input: &str) -> IResult<&str, HashMap<(char, char), cha
                 .iter()
                 .map(|(from, to)| {
                     let from = from.chars().collect::<Vec<char>>();
-                    let key = (*from.get(0).unwrap(), *from.get(1).unwrap());
-                    let value = *to.chars().collect::<Vec<char>>().get(0).unwrap();
+                    let key = (*from.first().unwrap(), *from.get(1).unwrap());
+                    let value = *to.chars().collect::<Vec<char>>().first().unwrap();
                     (key, value)
                 })
                 .collect::<HashMap<(char, char), char>>()

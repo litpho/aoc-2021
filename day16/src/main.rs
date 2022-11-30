@@ -60,26 +60,10 @@ impl Packet {
             1 => subpackets.iter().map(|s| s.content).product::<u64>(),
             2 => subpackets.iter().map(|s| s.content).min().unwrap(),
             3 => subpackets.iter().map(|s| s.content).max().unwrap(),
-            5 => {
-                if subpackets.get(0).unwrap().content > subpackets.get(1).unwrap().content {
-                    1
-                } else {
-                    0
-                }
-            }
-            6 => {
-                if subpackets.get(0).unwrap().content < subpackets.get(1).unwrap().content {
-                    1
-                } else {
-                    0
-                }
-            }
+            5 => u64::from(subpackets.get(0).unwrap().content > subpackets.get(1).unwrap().content),
+            6 => u64::from(subpackets.get(0).unwrap().content < subpackets.get(1).unwrap().content),
             7 => {
-                if subpackets.get(0).unwrap().content == subpackets.get(1).unwrap().content {
-                    1
-                } else {
-                    0
-                }
+                u64::from(subpackets.get(0).unwrap().content == subpackets.get(1).unwrap().content)
             }
             _ => 0,
         };

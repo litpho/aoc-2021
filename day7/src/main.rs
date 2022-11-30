@@ -33,7 +33,7 @@ fn algorithm(input: Vec<i32>, map_fn: fn(i32, i32) -> i64) -> (i32, i64) {
     let mut result: Option<(i32, i64)> = None;
     for x in *min..=*max {
         let sum = input.iter().map(|num| map_fn(*num, x)).sum::<i64>();
-        if result == None {
+        if result.is_none() {
             result = Some((x, sum));
         } else {
             let (_, res) = result.unwrap();

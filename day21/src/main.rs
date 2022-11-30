@@ -21,7 +21,7 @@ fn main() -> Result<()> {
 }
 
 fn part_one(input: Vec<u8>) -> u32 {
-    let mut one = Player::new(*input.get(0).unwrap());
+    let mut one = Player::new(*input.first().unwrap());
     let mut two = Player::new(*input.get(1).unwrap());
 
     let die = Die::new();
@@ -41,7 +41,7 @@ fn part_one(input: Vec<u8>) -> u32 {
 fn part_two(input: Vec<u8>) -> u64 {
     let start = Universe::new(
         1,
-        *input.get(0).unwrap(),
+        *input.first().unwrap(),
         *input.get(1).unwrap(),
         0,
         0,

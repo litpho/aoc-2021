@@ -65,7 +65,11 @@ impl Grid {
     fn enhance(&mut self, key: &[bool]) {
         self.attempt += 1;
         let def_value = if self.attempt % 2 == 0 { "1" } else { "0" };
-        let default = if *key.get(0).unwrap() { def_value } else { "0" };
+        let default = if *key.first().unwrap() {
+            def_value
+        } else {
+            "0"
+        };
         let mut new_image: HashSet<(isize, isize)> = HashSet::new();
         for y in -self.y_padding..self.max_y + self.y_padding {
             for x in -self.x_padding..self.max_x + self.x_padding {
