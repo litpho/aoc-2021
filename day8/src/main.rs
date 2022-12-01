@@ -1,5 +1,4 @@
 use anyhow::Result;
-use lazy_static::lazy_static;
 use nom::{
     bytes::complete::tag,
     character::complete::{alpha1, line_ending, space1},
@@ -8,21 +7,20 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
+use once_cell::sync::Lazy;
 use std::{cmp::Reverse, collections::HashMap, fs, io::Read};
 
-lazy_static! {
-    static ref BYTEMAP: HashMap<char, u8> = {
-        HashMap::from([
-            ('a', 1),
-            ('b', 2),
-            ('c', 4),
-            ('d', 8),
-            ('e', 16),
-            ('f', 32),
-            ('g', 64),
-        ])
-    };
-}
+static BYTEMAP: Lazy<HashMap<char, u8>> = Lazy::new(|| {
+    HashMap::from([
+        ('a', 1),
+        ('b', 2),
+        ('c', 4),
+        ('d', 8),
+        ('e', 16),
+        ('f', 32),
+        ('g', 64),
+    ])
+});
 
 fn main() -> Result<()> {
     let mut input = read_input()?;

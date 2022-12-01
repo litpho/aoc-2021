@@ -1,9 +1,9 @@
 use anyhow::Result;
-use lazy_static::lazy_static;
 use nom::{
     bytes::complete::tag, character::complete::digit1, character::complete::line_ending,
     combinator::map, multi::separated_list1, sequence::tuple, IResult,
 };
+use once_cell::sync::Lazy;
 use std::{cell::RefCell, cmp::max, fs, io::Read, str::FromStr};
 
 fn main() -> Result<()> {
@@ -79,10 +79,8 @@ fn part_two(input: Vec<u8>) -> u64 {
     max(games_won_one, games_won_two)
 }
 
-lazy_static! {
-    static ref DISTRIBUTION: Vec<(u8, u8)> =
-        vec![(1, 3), (3, 4), (6, 5), (7, 6), (6, 7), (3, 8), (1, 9)];
-}
+static DISTRIBUTION: Lazy<Vec<(u8, u8)>> =
+    Lazy::new(|| vec![(1, 3), (3, 4), (6, 5), (7, 6), (6, 7), (3, 8), (1, 9)]);
 
 #[derive(Clone, Debug)]
 struct Universe {
