@@ -1,6 +1,6 @@
 use anyhow::Result;
 use nom::{
-    bytes::complete::tag, character::complete::digit1, combinator::map, multi::separated_list1,
+    bytes::complete::tag, character::complete::digit1, combinator::map_res, multi::separated_list1,
     IResult,
 };
 use std::{collections::HashMap, fs, io::Read};
@@ -48,11 +48,8 @@ fn algorithm(mut input: HashMap<i8, i64>, days: i16) -> i64 {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<i8>> {
-    map(separated_list1(tag(","), digit1), |numbers| {
-        numbers
-            .into_iter()
-            .map(|num: &str| num.parse().unwrap())
-            .collect::<Vec<i8>>()
+    map_res(separated_list1(tag(","), digit1), |numbers| {
+        numbers.into_iter().map(|num: &str| num.parse()).collect()
     })(input)
 }
 
@@ -60,7 +57,7 @@ fn read_input() -> Result<HashMap<i8, i64>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, input) = parse(&buf).ok().unwrap();
+    let (_, input) = parse(&buf).expect("Parse failure");
     let mut map: HashMap<i8, i64> = HashMap::new();
     for fish in input {
         *map.entry(fish).or_insert(0) += 1;

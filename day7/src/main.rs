@@ -1,7 +1,7 @@
 use anyhow::Result;
 use itertools::Itertools;
 use nom::{
-    bytes::complete::tag, character::complete::digit1, combinator::map, multi::separated_list1,
+    bytes::complete::tag, character::complete::digit1, combinator::map_res, multi::separated_list1,
     IResult,
 };
 use std::{fs, io::Read};
@@ -54,11 +54,8 @@ fn calc(n: i64) -> i64 {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<i32>> {
-    map(separated_list1(tag(","), digit1), |numbers| {
-        numbers
-            .into_iter()
-            .map(|num: &str| num.parse().unwrap())
-            .collect::<Vec<i32>>()
+    map_res(separated_list1(tag(","), digit1), |numbers| {
+        numbers.into_iter().map(|num: &str| num.parse()).collect()
     })(input)
 }
 
@@ -66,7 +63,7 @@ fn read_input() -> Result<Vec<i32>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, input) = parse(&buf).ok().unwrap();
+    let (_, input) = parse(&buf).expect("Parse failure");
 
     Ok(input)
 }

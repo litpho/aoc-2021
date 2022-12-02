@@ -2,7 +2,7 @@ use anyhow::Result;
 use hierarchical_pathfinding::{prelude::ManhattanNeighborhood, PathCache, PathCacheConfig};
 use nom::{
     bytes::complete::take_while1, character::complete::line_ending, character::is_digit,
-    combinator::map, multi::separated_list1, IResult,
+    combinator::map, combinator::map_res, multi::separated_list1, IResult,
 };
 use std::{fs, io::Read};
 
@@ -192,9 +192,9 @@ fn parse(input: &[u8]) -> IResult<&[u8], Grid> {
 }
 
 fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<i32>> {
-    map(take_while1(is_digit), |a: &[u8]| {
+    map_res(take_while1(is_digit), |a: &[u8]| {
         a.iter()
-            .map(|c| (c - 48).to_string().parse::<i32>().unwrap())
+            .map(|c| (c - 48).to_string().parse::<i32>())
             .collect()
     })(input)
 }
@@ -203,7 +203,7 @@ fn read_input() -> Result<Grid> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, input) = parse(buf.as_bytes()).ok().unwrap();
+    let (_, input) = parse(buf.as_bytes()).expect("Parse failure");
 
     Ok(input)
 }

@@ -3,7 +3,7 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{digit1, line_ending, space1},
-    combinator::{eof, map},
+    combinator::{eof, map, map_res},
     multi::{count, separated_list1},
     sequence::{separated_pair, terminated},
     IResult,
@@ -119,12 +119,12 @@ fn parse(input: &str) -> IResult<&str, (Vec<u8>, Vec<Card>)> {
 }
 
 fn parse_called_numbers(input: &str) -> IResult<&str, Vec<u8>> {
-    map(
+    map_res(
         terminated(separated_list1(tag(","), digit1), line_ending),
         |nums| {
             nums.into_iter()
-                .map(|num: &str| num.parse::<u8>().unwrap())
-                .collect::<Vec<u8>>()
+                .map(|num: &str| num.parse::<u8>())
+                .collect()
         },
     )(input)
 }
@@ -141,14 +141,9 @@ fn parse_card(input: &str) -> IResult<&str, Card> {
 }
 
 fn parse_card_line(input: &str) -> IResult<&str, Vec<u8>> {
-    map(
+    map_res(
         terminated(separated_list1(space1, digit1), alt((line_ending, eof))),
-        |numbers: Vec<&str>| {
-            numbers
-                .iter()
-                .map(|number| number.parse::<u8>().unwrap())
-                .collect::<Vec<u8>>()
-        },
+        |numbers: Vec<&str>| numbers.iter().map(|number| number.parse::<u8>()).collect(),
     )(input)
 }
 
@@ -156,7 +151,7 @@ fn read_input() -> Result<(Vec<u8>, Vec<Card>)> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, (called_numbers, cards)) = parse(&buf).ok().unwrap();
+    let (_, (called_numbers, cards)) = parse(&buf).expect("Parse failure");
 
     Ok((called_numbers, cards))
 }

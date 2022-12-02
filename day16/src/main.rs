@@ -173,8 +173,8 @@ fn read_input() -> Result<Packet> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, input) = parse_hex_as_binary(buf.as_bytes()).ok().unwrap();
-    let (_, input) = parse(input.as_str()).ok().unwrap();
+    let (_, input) = parse_hex_as_binary(buf.as_bytes()).expect("Parse hex failure");
+    let (_, input) = parse(input.as_str()).expect("Parse failure");
 
     Ok(input)
 }

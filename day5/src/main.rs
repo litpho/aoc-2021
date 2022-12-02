@@ -130,9 +130,9 @@ fn read_input() -> Result<Vec<Line>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, lines) = parse(&buf).ok().unwrap();
+    let (_, input) = parse(&buf).expect("Parse failure");
 
-    Ok(lines)
+    Ok(input)
 }
 
 #[cfg(test)]

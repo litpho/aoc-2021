@@ -1,7 +1,7 @@
 use anyhow::Result;
 use nom::{
     character::complete::{digit1, line_ending},
-    combinator::map,
+    combinator::map_res,
     multi::separated_list1,
     IResult,
 };
@@ -41,14 +41,14 @@ fn parse(input: &str) -> IResult<&str, Vec<u16>> {
 }
 
 fn parse_line(input: &str) -> IResult<&str, u16> {
-    map(digit1, |num: &str| num.parse::<u16>().unwrap())(input)
+    map_res(digit1, |num: &str| num.parse::<u16>())(input)
 }
 
 fn read_input() -> Result<Vec<u16>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, input) = parse(&buf).ok().unwrap();
+    let (_, input) = parse(&buf).expect("Parse failure");
 
     Ok(input)
 }
