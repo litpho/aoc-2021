@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
 use nom::{
     character::complete::line_ending, character::complete::one_of, combinator::map, multi::many1,
     multi::separated_list1, IResult,
@@ -13,7 +13,7 @@ fn main() -> Result<()> {
     println!("Time spent: {}", took);
 
     let (took, result) = took::took(|| part_two(&input));
-    println!("Result part two: {}", result);
+    println!("Result part two: {}", result?);
     println!("Time spent: {}", took);
 
     Ok(())
@@ -27,7 +27,7 @@ fn part_one(input: &[Vec<Token>]) -> i32 {
         .sum::<i32>()
 }
 
-fn part_two(input: &[Vec<Token>]) -> i64 {
+fn part_two(input: &[Vec<Token>]) -> Result<i64> {
     let mut results = input
         .iter()
         .filter_map(|s| line_to_score(s))
@@ -35,7 +35,10 @@ fn part_two(input: &[Vec<Token>]) -> i64 {
 
     results.sort_unstable();
 
-    *results.get(results.len() / 2).unwrap()
+    results
+        .get(results.len() / 2)
+        .cloned()
+        .ok_or_else(|| Error::msg("Result didn't exist"))
 }
 
 fn check_line(line: &[Token]) -> Option<Token> {
@@ -162,7 +165,7 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let mut input = read_input()?;
 
-        let count = part_two(&mut input);
+        let count = part_two(&mut input)?;
 
         assert_eq!(3049320156, count);
 

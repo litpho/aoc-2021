@@ -1,10 +1,10 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
 use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::space1,
     character::complete::{digit1, line_ending},
-    combinator::{eof, map},
+    combinator::{eof, map_res},
     multi::many1,
     sequence::{separated_pair, terminated},
     IResult,
@@ -60,16 +60,17 @@ fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
 }
 
 fn parse_line(input: &str) -> IResult<&str, Instruction> {
-    map(
+    map_res(
         separated_pair(parse_command, space1, digit1),
         |(command, number)| {
-            let value = number.parse::<i32>().unwrap();
-            match command {
+            let value = number.parse::<i32>()?;
+            let instruction = match command {
                 "forward" => Instruction::Forward(value),
                 "down" => Instruction::Down(value),
                 "up" => Instruction::Up(value),
                 _ => unreachable!(),
-            }
+            };
+            Ok::<Instruction, Error>(instruction)
         },
     )(input)
 }
