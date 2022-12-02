@@ -15,12 +15,12 @@ fn main() -> Result<()> {
     let input = read_input()?;
 
     let (took, (x, depth)) = took::took(|| part_one(&input));
-    println!("Result part one: {} / {} = {}", x, depth, x * depth);
-    println!("Time spent: {}", took);
+    println!("Result part one: {x} / {depth} = {}", x * depth);
+    println!("Time spent: {took}");
 
     let (took, (x, depth)) = took::took(|| part_two(&input));
-    println!("Result part two: {} / {} = {}", x, depth, x * depth);
-    println!("Time spent: {}", took);
+    println!("Result part two: {x} / {depth} = {}", x * depth);
+    println!("Time spent: {took}");
 
     Ok(())
 }

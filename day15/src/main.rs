@@ -10,12 +10,12 @@ fn main() -> Result<()> {
     let input = read_input()?;
 
     let (took, result) = took::took(|| part_one_lib(&input));
-    println!("Result part one: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part one: {result}");
+    println!("Time spent: {took}");
 
     let (took, result) = took::took(|| part_two_lib(&input));
-    println!("Result part two: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part two: {result}");
+    println!("Time spent: {took}");
 
     Ok(())
 }
@@ -64,13 +64,13 @@ fn part_two_lib(grid: &Grid) -> usize {
 //             }
 //
 //             if a > grid.max_x - 2 || b > grid.max_y - 2 {
-//                 println!("{},{} - {}: {}", a, b, routes.len(), lowest_count);
+//                 println!("{a},{b} - {}: {lowest_count}", routes.len());
 //             }
 //
-//             // println!("{},{}:{},{} ({},{}) - {:?}", x, y, a, b, lowest_count, routes.len(), route);
+//             // println!("{x},{y}:{a},{b} ({lowest_count},{}) - {:?}", routes.len(), route);
 //
 //             if a == grid.max_x && b == grid.max_y {
-//                 println!("Bingo! {}: {} < {}", routes.len(), lowest_count, *last_val + val);
+//                 println!("Bingo! {}: {lowest_count} < {}", routes.len(), *last_val + val);
 //                 if lowest_count > *last_val + val {
 //                     lowest_count = *last_val + val;
 //                 }
@@ -109,9 +109,9 @@ fn traverse_lib(grid: &Grid) -> usize {
         let cost =
             path.cost() - grid.cell(0, 0).2 as usize + grid.cell(grid.max_x, grid.max_y).2 as usize;
         println!("Number of steps: {}", path.length());
-        println!("Total Cost: {}", cost);
+        println!("Total Cost: {cost}");
         // for (x, y) in path {
-        //     println!("Go to {}, {}", x, y);
+        //     println!("Go to {x}, {y}");
         // }
         return cost;
     }
@@ -142,7 +142,7 @@ impl Grid {
 
     // pub fn get_neighbours(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
     //     let mut result: Vec<(usize, usize)> = Vec::new();
-    //     // println!("{},{}: {} > {} = {}", x, y, self.max_y - y, self.max_x - x, self.max_y - y > self.max_x - x);
+    //     // println!("{x},{y}: {} > {} = {}", self.max_y - y, self.max_x - x, self.max_y - y > self.max_x - x);
     //     if x < self.max_x {
     //         result.push((x + 1, y));
     //     }

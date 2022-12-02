@@ -12,17 +12,17 @@ fn main() -> Result<()> {
 
     let (took, result) = took::took(|| part_one(&input));
     let (gamma, epsilon) = result?;
-    println!("Gamma: {}", gamma);
-    println!("Epsilon: {}", epsilon);
+    println!("Gamma: {gamma}");
+    println!("Epsilon: {epsilon}");
     println!("Result part one: {}", gamma * epsilon);
-    println!("Time spent: {}", took);
+    println!("Time spent: {took}");
 
     let (took, result) = took::took(|| part_two(input));
     let (oxygen, co2) = result?;
-    println!("Oxygen: {}", oxygen);
-    println!("CO2: {}", co2);
+    println!("Oxygen: {oxygen}");
+    println!("CO2: {co2}");
     println!("Result part two: {}", oxygen * co2);
-    println!("Time spent: {}", took);
+    println!("Time spent: {took}");
 
     Ok(())
 }

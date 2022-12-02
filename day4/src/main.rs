@@ -18,19 +18,17 @@ fn main() -> Result<()> {
         part_one(&called_numbers, &mut cards)
     });
     let (called_number, card_sum) = result.expect("No result found");
-    println!("called_number: {}", called_number);
-    println!("Sum: {}", card_sum);
+    println!("called_number: {called_number}");
+    println!("Sum: {card_sum}");
     println!("Result part one: {}", (called_number as u32) * card_sum);
-    println!("Time spent: {}", took);
+    println!("Time spent: {took}");
 
-    let (took, result) = took::took(|| {
-        part_two(&called_numbers, &mut cards)
-    });
+    let (took, result) = took::took(|| part_two(&called_numbers, &mut cards));
     let (called_number, card_sum) = result.expect("No result found");
-    println!("called_number: {}", called_number);
-    println!("Sum: {}", card_sum);
+    println!("called_number: {called_number}");
+    println!("Sum: {card_sum}");
     println!("Result part two: {}", (called_number as u32) * card_sum);
-    println!("Time spent: {}", took);
+    println!("Time spent: {took}");
 
     Ok(())
 }
@@ -164,7 +162,8 @@ mod tests {
     fn test_part_one() -> Result<()> {
         let (called_numbers, mut cards) = read_input()?;
 
-        let (called_number, card_sum) = part_one(&called_numbers, &mut cards).expect("No result found");
+        let (called_number, card_sum) =
+            part_one(&called_numbers, &mut cards).expect("No result found");
 
         assert_eq!(42, called_number);
         assert_eq!(782, card_sum);
@@ -176,7 +175,8 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let (called_numbers, mut cards) = read_input()?;
 
-        let (called_number, card_sum) = part_two(&called_numbers, &mut cards).expect("No result found");
+        let (called_number, card_sum) =
+            part_two(&called_numbers, &mut cards).expect("No result found");
 
         assert_eq!(20, called_number);
         assert_eq!(246, card_sum);

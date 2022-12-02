@@ -9,12 +9,12 @@ fn main() -> Result<()> {
     let input = read_input()?;
 
     let (took, result) = took::took(|| part_one(&input));
-    println!("Result part one: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part one: {result}");
+    println!("Time spent: {took}");
 
     let (took, result) = took::took(|| part_two(&input));
-    println!("Result part two: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part two: {result}");
+    println!("Time spent: {took}");
 
     Ok(())
 }

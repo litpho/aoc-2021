@@ -14,12 +14,12 @@ fn main() -> Result<()> {
     let (template, rules) = read_input()?;
 
     let (took, result) = took::took(|| part_one(template.clone(), &rules));
-    println!("Result part one: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part one: {result}");
+    println!("Time spent: {took}");
 
     let (took, result) = took::took(|| part_two(template, &rules));
-    println!("Result part two: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part two: {result}");
+    println!("Time spent: {took}");
 
     Ok(())
 }

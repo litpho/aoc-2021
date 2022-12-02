@@ -15,12 +15,12 @@ fn main() -> Result<()> {
     let input = read_input()?;
 
     let (took, result) = took::took(|| part_one(input.clone()));
-    println!("Result part one: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part one: {result}");
+    println!("Time spent: {took}");
 
     let (took, result) = took::took(|| part_two(input));
-    println!("Result part two: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part two: {result}");
+    println!("Time spent: {took}");
 
     Ok(())
 }
@@ -35,7 +35,7 @@ fn part_one(input: Vec<Vec<Number>>) -> i32 {
         .map(|n| n.to_string())
         .collect::<Vec<String>>()
         .join(",");
-    println!("Output: {}", output);
+    println!("Output: {output}");
 
     grid.magnitude()
 }

@@ -16,12 +16,12 @@ fn main() -> Result<()> {
     let (grid, instructions) = read_input()?;
 
     let (took, result) = took::took(|| part_one(grid.clone(), instructions.clone()));
-    println!("Result part one: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part one: {result}");
+    println!("Time spent: {took}");
 
     let (took, result) = took::took(|| part_two(grid, instructions));
-    println!("Result part two: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part two: {result}");
+    println!("Time spent: {took}");
 
     Ok(())
 }
@@ -146,7 +146,7 @@ fn parse_instruction_line(input: &str) -> IResult<&str, Instruction> {
             let direction = match a {
                 "x" => Direction::X,
                 "y" => Direction::Y,
-                _ => panic!("Direction {} was not readable", a),
+                _ => panic!("Direction {a} was not readable"),
             };
             let location = b.parse::<i16>().unwrap();
             Instruction {

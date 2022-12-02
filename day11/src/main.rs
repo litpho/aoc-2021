@@ -9,14 +9,14 @@ fn main() -> Result<()> {
     let mut input = read_input()?;
 
     let (took, result) = took::took(|| part_one(&mut input));
-    println!("Result part one: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part one: {result}");
+    println!("Time spent: {took}");
 
     let mut input = read_input()?;
 
     let (took, result) = took::took(|| part_two(&mut input));
-    println!("Result part two: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part two: {result}");
+    println!("Time spent: {took}");
 
     Ok(())
 }

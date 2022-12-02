@@ -11,13 +11,13 @@ fn main() -> Result<()> {
 
     let (took, result) = took::took(|| part_one(input.clone()));
     let (position, fuel_spent) = result?;
-    println!("Result part one: {} - {}", position, fuel_spent);
-    println!("Time spent: {}", took);
+    println!("Result part one: {position} - {fuel_spent}");
+    println!("Time spent: {took}");
 
     let (took, result) = took::took(|| part_two(input));
     let (position, fuel_spent) = result?;
-    println!("Result part two: {} - {}", position, fuel_spent);
-    println!("Time spent: {}", took);
+    println!("Result part two: {position} - {fuel_spent}");
+    println!("Time spent: {took}");
 
     Ok(())
 }
@@ -54,7 +54,7 @@ fn algorithm(input: Vec<i32>, map_fn: fn(i32, i32) -> i64) -> Result<(i32, i64)>
 fn calc(n: i64) -> i64 {
     match n {
         0 => 0,
-        n if n < 0 => panic!("{} is negative!", n),
+        n if n < 0 => panic!("{n} is negative!"),
         _ => (1..=n).sum(),
     }
 }

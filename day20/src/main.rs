@@ -14,12 +14,12 @@ fn main() -> Result<()> {
     let (key, grid) = read_input()?;
 
     let (took, result) = took::took(|| part_one(key.clone(), grid.clone()));
-    println!("Result part one: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part one: {result}");
+    println!("Time spent: {took}");
 
     let (took, result) = took::took(|| part_two(key, grid));
-    println!("Result part two: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part two: {result}");
+    println!("Time spent: {took}");
 
     Ok(())
 }
@@ -114,7 +114,7 @@ impl Grid {
                 } else {
                     '.'
                 };
-                print!("{}", s);
+                print!("{s}");
             }
             println!();
         }
