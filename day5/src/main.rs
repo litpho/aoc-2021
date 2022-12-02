@@ -1,4 +1,5 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
+use nom::combinator::map_res;
 use nom::{
     bytes::complete::tag,
     character::complete::{digit1, line_ending},
@@ -121,8 +122,10 @@ fn parse_line(input: &str) -> IResult<&str, Line> {
 }
 
 fn parse_point(input: &str) -> IResult<&str, (usize, usize)> {
-    map(separated_pair(digit1, tag(","), digit1), |(x, y)| {
-        (usize::from_str(x).unwrap(), usize::from_str(y).unwrap())
+    map_res(separated_pair(digit1, tag(","), digit1), |(x, y)| {
+        let x = usize::from_str(x).map_err(Error::from)?;
+        let y = usize::from_str(y).map_err(Error::from)?;
+        Ok::<(usize, usize), Error>((x, y))
     })(input)
 }
 

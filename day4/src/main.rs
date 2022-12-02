@@ -13,20 +13,20 @@ use std::{collections::HashMap, fs, io::Read, ops::Rem};
 fn main() -> Result<()> {
     let (called_numbers, mut cards) = read_input()?;
 
-    let (took, (called_number, card_sum)) = took::took(|| {
+    let (took, result) = took::took(|| {
         let mut cards = cards.clone();
-        let (called_numbers, card) = part_one(&called_numbers, &mut cards).unwrap();
-        (called_numbers, card.sum())
+        part_one(&called_numbers, &mut cards)
     });
+    let (called_number, card_sum) = result.expect("No result found");
     println!("called_number: {}", called_number);
     println!("Sum: {}", card_sum);
     println!("Result part one: {}", (called_number as u32) * card_sum);
     println!("Time spent: {}", took);
 
-    let (took, (called_number, card_sum)) = took::took(|| {
-        let (called_number, card) = part_two(&called_numbers, &mut cards).unwrap();
-        (called_number, card.sum())
+    let (took, result) = took::took(|| {
+        part_two(&called_numbers, &mut cards)
     });
+    let (called_number, card_sum) = result.expect("No result found");
     println!("called_number: {}", called_number);
     println!("Sum: {}", card_sum);
     println!("Result part two: {}", (called_number as u32) * card_sum);
@@ -35,12 +35,12 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn part_one(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, Card)> {
+fn part_one(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, u32)> {
     for called_number in called_numbers {
         for card in cards.iter_mut() {
             if let Some(pos) = card.mark(called_number) {
                 if card.bingo(pos) {
-                    return Some((*called_number, card.clone()));
+                    return Some((*called_number, card.sum()));
                 }
             }
         }
@@ -49,7 +49,7 @@ fn part_one(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, Card)> {
     None
 }
 
-fn part_two(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, Card)> {
+fn part_two(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, u32)> {
     let mut won_cards: Vec<Card> = Vec::new();
     for called_number in called_numbers {
         for card in cards.iter_mut() {
@@ -58,7 +58,7 @@ fn part_two(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, Card)> {
                     if card.bingo(pos) {
                         won_cards.push(card.clone());
                         if won_cards.len() == 100 {
-                            return Some((*called_number, card.clone()));
+                            return Some((*called_number, card.sum()));
                         }
                     }
                 }
@@ -164,10 +164,10 @@ mod tests {
     fn test_part_one() -> Result<()> {
         let (called_numbers, mut cards) = read_input()?;
 
-        let (called_number, card) = part_one(&called_numbers, &mut cards).unwrap();
+        let (called_number, card_sum) = part_one(&called_numbers, &mut cards).expect("No result found");
 
         assert_eq!(42, called_number);
-        assert_eq!(782, card.sum());
+        assert_eq!(782, card_sum);
 
         Ok(())
     }
@@ -176,10 +176,10 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let (called_numbers, mut cards) = read_input()?;
 
-        let (called_number, card) = part_two(&called_numbers, &mut cards).unwrap();
+        let (called_number, card_sum) = part_two(&called_numbers, &mut cards).expect("No result found");
 
         assert_eq!(20, called_number);
-        assert_eq!(246, card.sum());
+        assert_eq!(246, card_sum);
 
         Ok(())
     }
