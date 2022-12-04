@@ -1,18 +1,18 @@
-use anyhow::Result;
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::{self, line_ending},
-    combinator::map,
-    multi::separated_list1,
-    sequence::{delimited, separated_pair},
-    IResult,
-};
 use std::{
     cell::RefCell,
     fmt::{Display, Formatter},
     fs,
     io::Read,
+};
+
+use anyhow::Result;
+use nom::{
+    branch::alt,
+    character::complete::{self, line_ending},
+    combinator::map,
+    multi::separated_list1,
+    sequence::{delimited, separated_pair},
+    IResult,
 };
 
 fn main() -> Result<()> {
@@ -203,9 +203,9 @@ fn parse_tuple(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Number>> {
     move |input: &str| {
         map(
             delimited(
-                tag("["),
-                separated_pair(parse_value(depth), tag(","), parse_value(depth)),
-                tag("]"),
+                complete::char('['),
+                separated_pair(parse_value(depth), complete::char(','), parse_value(depth)),
+                complete::char(']'),
             ),
             |(x, y)| vec![x, y].concat(),
         )(input)

@@ -118,7 +118,7 @@ fn parse_line(input: &str) -> IResult<&str, Line> {
 
 fn parse_point(input: &str) -> IResult<&str, (usize, usize)> {
     map(
-        separated_pair(complete::u32, tag(","), complete::u32),
+        separated_pair(complete::u32, complete::char(','), complete::u32),
         |(x, y)| (x.to_usize(), y.to_usize()),
     )(input)
 }

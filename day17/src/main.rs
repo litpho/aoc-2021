@@ -4,8 +4,7 @@ use anyhow::Result;
 use nom::{
     bytes::complete::tag,
     character::complete,
-    combinator::map,
-    combinator::opt,
+    combinator::{map, opt},
     sequence::{pair, separated_pair, tuple},
     IResult,
 };
@@ -119,10 +118,13 @@ fn parse_range(input: &str) -> IResult<&str, (i32, i32)> {
 }
 
 fn parse_number(input: &str) -> IResult<&str, i32> {
-    map(pair(opt(tag("-")), complete::i32), |(negative, number)| {
-        let multiplier = if negative.is_some() { -1 } else { 1 };
-        multiplier * number
-    })(input)
+    map(
+        pair(opt(complete::char('-')), complete::i32),
+        |(negative, number)| {
+            let multiplier = if negative.is_some() { -1 } else { 1 };
+            multiplier * number
+        },
+    )(input)
 }
 
 fn read_input() -> Result<TargetArea> {

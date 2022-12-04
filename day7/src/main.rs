@@ -1,7 +1,8 @@
+use std::{fs, io::Read};
+
 use anyhow::{Error, Result};
 use itertools::Itertools;
-use nom::{bytes::complete::tag, character::complete, multi::separated_list1, IResult};
-use std::{fs, io::Read};
+use nom::{character::complete, multi::separated_list1, IResult};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -57,7 +58,7 @@ fn calc(n: i64) -> i64 {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<i32>> {
-    separated_list1(tag(","), complete::i32)(input)
+    separated_list1(complete::char(','), complete::i32)(input)
 }
 
 fn read_input() -> Result<Vec<i32>> {

@@ -3,7 +3,6 @@ use std::{collections::HashMap, fs, io::Read, ops::Rem};
 use anyhow::Result;
 use nom::{
     branch::alt,
-    bytes::complete::tag,
     character::{complete, complete::line_ending, complete::space1},
     combinator::{eof, map},
     multi::{count, separated_list1},
@@ -118,7 +117,10 @@ fn parse(input: &str) -> IResult<&str, (Vec<u8>, Vec<Card>)> {
 }
 
 fn parse_called_numbers(input: &str) -> IResult<&str, Vec<u8>> {
-    terminated(separated_list1(tag(","), complete::u8), line_ending)(input)
+    terminated(
+        separated_list1(complete::char(','), complete::u8),
+        line_ending,
+    )(input)
 }
 
 fn parse_cards(input: &str) -> IResult<&str, Vec<Card>> {

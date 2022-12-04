@@ -1,16 +1,15 @@
+use std::{fs, io::Read};
+
 use anyhow::Result;
 use nom::{
     branch::alt,
-    bytes::complete::take_while1,
-    bytes::complete::{tag, take},
-    character::is_hex_digit,
+    bytes::complete::{tag, take, take_while1},
+    character::{complete, is_hex_digit},
     combinator::map,
-    multi::many_till,
-    multi::{count, many1},
+    multi::{count, many1, many_till},
     sequence::{pair, preceded},
     AsChar, IResult,
 };
-use std::{fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -144,11 +143,11 @@ fn parse_literal(input: &str) -> IResult<&str, u64> {
 }
 
 fn parse_literal_part(input: &str) -> IResult<&str, &str> {
-    map(pair(tag("1"), take(4usize)), |(_, b)| b)(input)
+    map(pair(complete::char('1'), take(4usize)), |(_, b)| b)(input)
 }
 
 fn parse_literal_end(input: &str) -> IResult<&str, &str> {
-    map(pair(tag("0"), take(4usize)), |(_, b)| b)(input)
+    map(pair(complete::char('0'), take(4usize)), |(_, b)| b)(input)
 }
 
 fn parse_hex_as_binary(input: &[u8]) -> IResult<&[u8], String> {

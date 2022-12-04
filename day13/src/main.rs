@@ -128,7 +128,7 @@ fn parse_dots(input: &str) -> IResult<&str, Grid> {
 }
 
 fn parse_dot_line(input: &str) -> IResult<&str, (i16, i16)> {
-    separated_pair(complete::i16, tag(","), complete::i16)(input)
+    separated_pair(complete::i16, complete::char(','), complete::i16)(input)
 }
 
 fn parse_instructions(input: &str) -> IResult<&str, Vec<Instruction>> {
@@ -139,7 +139,7 @@ fn parse_instruction_line(input: &str) -> IResult<&str, Instruction> {
     map(
         preceded(
             tag("fold along "),
-            separated_pair(alpha1, tag("="), complete::i16),
+            separated_pair(alpha1, complete::char('='), complete::i16),
         ),
         |(a, location)| {
             let direction = match a {

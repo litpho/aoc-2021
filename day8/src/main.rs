@@ -1,3 +1,5 @@
+use std::{cmp::Reverse, collections::HashMap, fs, io::Read};
+
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
@@ -8,7 +10,6 @@ use nom::{
     IResult,
 };
 use once_cell::sync::Lazy;
-use std::{cmp::Reverse, collections::HashMap, fs, io::Read};
 
 static BYTEMAP: Lazy<HashMap<char, u8>> = Lazy::new(|| {
     HashMap::from([

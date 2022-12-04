@@ -1,16 +1,16 @@
-use anyhow::Result;
-use nom::{
-    bytes::complete::tag,
-    character::complete::{alpha1, line_ending},
-    combinator::map,
-    multi::separated_list1,
-    sequence::separated_pair,
-    IResult,
-};
 use std::{
     collections::{HashMap, HashSet},
     fs,
     io::Read,
+};
+
+use anyhow::Result;
+use nom::{
+    character::complete::{self, alpha1, line_ending},
+    combinator::map,
+    multi::separated_list1,
+    sequence::separated_pair,
+    IResult,
 };
 
 fn main() -> Result<()> {
@@ -158,7 +158,7 @@ fn parse(input: &str) -> IResult<&str, HashMap<String, Node>> {
 }
 
 fn parse_line(input: &str) -> IResult<&str, (&str, &str)> {
-    separated_pair(alpha1, tag("-"), alpha1)(input)
+    separated_pair(alpha1, complete::char('-'), alpha1)(input)
 }
 
 fn read_input() -> Result<HashMap<String, Node>> {
