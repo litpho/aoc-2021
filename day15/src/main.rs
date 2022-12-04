@@ -194,7 +194,7 @@ fn parse(input: &[u8]) -> IResult<&[u8], Grid> {
 fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<i32>> {
     map_res(take_while1(is_digit), |a: &[u8]| {
         a.iter()
-            .map(|c| (c - 48).to_string().parse::<i32>())
+            .map(|c| (c - b'0').to_string().parse::<i32>())
             .collect()
     })(input)
 }
