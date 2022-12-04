@@ -1,16 +1,14 @@
+use std::{cmp::Ordering, collections::HashSet, fs, io::Read};
+
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
-    character::complete::digit1,
-    character::complete::{alpha1, line_ending},
+    character::complete::{self, alpha1, line_ending},
     combinator::map,
-    multi::count,
-    multi::separated_list1,
-    sequence::preceded,
-    sequence::separated_pair,
+    multi::{count, separated_list1},
+    sequence::{preceded, separated_pair},
     IResult,
 };
-use std::{cmp::Ordering, collections::HashSet, fs, io::Read, str::FromStr};
 
 fn main() -> Result<()> {
     let (grid, instructions) = read_input()?;
@@ -130,9 +128,7 @@ fn parse_dots(input: &str) -> IResult<&str, Grid> {
 }
 
 fn parse_dot_line(input: &str) -> IResult<&str, (i16, i16)> {
-    map(separated_pair(digit1, tag(","), digit1), |(a, b)| {
-        (i16::from_str(a).unwrap(), i16::from_str(b).unwrap())
-    })(input)
+    separated_pair(complete::i16, tag(","), complete::i16)(input)
 }
 
 fn parse_instructions(input: &str) -> IResult<&str, Vec<Instruction>> {
@@ -141,14 +137,16 @@ fn parse_instructions(input: &str) -> IResult<&str, Vec<Instruction>> {
 
 fn parse_instruction_line(input: &str) -> IResult<&str, Instruction> {
     map(
-        preceded(tag("fold along "), separated_pair(alpha1, tag("="), digit1)),
-        |(a, b)| {
+        preceded(
+            tag("fold along "),
+            separated_pair(alpha1, tag("="), complete::i16),
+        ),
+        |(a, location)| {
             let direction = match a {
                 "x" => Direction::X,
                 "y" => Direction::Y,
                 _ => panic!("Direction {a} was not readable"),
             };
-            let location = b.parse::<i16>().unwrap();
             Instruction {
                 direction,
                 location,

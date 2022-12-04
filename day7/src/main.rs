@@ -1,9 +1,6 @@
 use anyhow::{Error, Result};
 use itertools::Itertools;
-use nom::{
-    bytes::complete::tag, character::complete::digit1, combinator::map_res, multi::separated_list1,
-    IResult,
-};
+use nom::{bytes::complete::tag, character::complete, multi::separated_list1, IResult};
 use std::{fs, io::Read};
 
 fn main() -> Result<()> {
@@ -60,9 +57,7 @@ fn calc(n: i64) -> i64 {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<i32>> {
-    map_res(separated_list1(tag(","), digit1), |numbers| {
-        numbers.into_iter().map(|num: &str| num.parse()).collect()
-    })(input)
+    separated_list1(tag(","), complete::i32)(input)
 }
 
 fn read_input() -> Result<Vec<i32>> {

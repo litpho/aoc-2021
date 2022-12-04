@@ -1,8 +1,12 @@
 use anyhow::Result;
 use nom::{
-    branch::alt, bytes::complete::tag, character::complete::digit1,
-    character::complete::line_ending, combinator::map, multi::separated_list1, sequence::delimited,
-    sequence::separated_pair, IResult,
+    branch::alt,
+    bytes::complete::tag,
+    character::complete::{self, line_ending},
+    combinator::map,
+    multi::separated_list1,
+    sequence::{delimited, separated_pair},
+    IResult,
 };
 use std::{
     cell::RefCell,
@@ -212,9 +216,7 @@ fn parse_value(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Number>> {
     move |input: &str| {
         alt((
             parse_tuple(depth + 1),
-            map(digit1, |num: &str| {
-                vec![Number::new(num.parse().unwrap(), depth)]
-            }),
+            map(complete::i16, |value| vec![Number::new(value, depth)]),
         ))(input)
     }
 }

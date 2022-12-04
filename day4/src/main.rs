@@ -1,14 +1,15 @@
+use std::{collections::HashMap, fs, io::Read, ops::Rem};
+
 use anyhow::Result;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{digit1, line_ending, space1},
-    combinator::{eof, map, map_res},
+    character::{complete, complete::line_ending, complete::space1},
+    combinator::{eof, map},
     multi::{count, separated_list1},
     sequence::{separated_pair, terminated},
     IResult,
 };
-use std::{collections::HashMap, fs, io::Read, ops::Rem};
 
 fn main() -> Result<()> {
     let (called_numbers, mut cards) = read_input()?;
@@ -117,14 +118,7 @@ fn parse(input: &str) -> IResult<&str, (Vec<u8>, Vec<Card>)> {
 }
 
 fn parse_called_numbers(input: &str) -> IResult<&str, Vec<u8>> {
-    map_res(
-        terminated(separated_list1(tag(","), digit1), line_ending),
-        |nums| {
-            nums.into_iter()
-                .map(|num: &str| num.parse::<u8>())
-                .collect()
-        },
-    )(input)
+    terminated(separated_list1(tag(","), complete::u8), line_ending)(input)
 }
 
 fn parse_cards(input: &str) -> IResult<&str, Vec<Card>> {
@@ -139,9 +133,9 @@ fn parse_card(input: &str) -> IResult<&str, Card> {
 }
 
 fn parse_card_line(input: &str) -> IResult<&str, Vec<u8>> {
-    map_res(
-        terminated(separated_list1(space1, digit1), alt((line_ending, eof))),
-        |numbers: Vec<&str>| numbers.iter().map(|number| number.parse::<u8>()).collect(),
+    terminated(
+        separated_list1(space1, complete::u8),
+        alt((line_ending, eof)),
     )(input)
 }
 

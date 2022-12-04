@@ -1,13 +1,14 @@
+use std::{fs, io::Read};
+
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
-    character::complete::digit1,
+    character::complete,
     combinator::map,
     combinator::opt,
     sequence::{pair, separated_pair, tuple},
     IResult,
 };
-use std::{fs, io::Read, str::FromStr};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -118,9 +119,9 @@ fn parse_range(input: &str) -> IResult<&str, (i32, i32)> {
 }
 
 fn parse_number(input: &str) -> IResult<&str, i32> {
-    map(pair(opt(tag("-")), digit1), |(negative, number)| {
+    map(pair(opt(tag("-")), complete::i32), |(negative, number)| {
         let multiplier = if negative.is_some() { -1 } else { 1 };
-        multiplier * i32::from_str(number).unwrap()
+        multiplier * number
     })(input)
 }
 

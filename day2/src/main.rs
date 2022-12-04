@@ -1,15 +1,15 @@
-use anyhow::{Error, Result};
+use std::{fs, io::Read};
+
+use anyhow::Result;
+use nom::multi::separated_list1;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::space1,
-    character::complete::{digit1, line_ending},
-    combinator::{eof, map_res},
-    multi::many1,
-    sequence::{separated_pair, terminated},
+    character::{complete, complete::line_ending, complete::space1},
+    combinator::map,
+    sequence::separated_pair,
     IResult,
 };
-use std::{fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -56,21 +56,17 @@ fn part_two(input: &[Instruction]) -> (i32, i32) {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
-    many1(terminated(parse_line, alt((line_ending, eof))))(input)
+    separated_list1(line_ending, parse_line)(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Instruction> {
-    map_res(
-        separated_pair(parse_command, space1, digit1),
-        |(command, number)| {
-            let value = number.parse::<i32>()?;
-            let instruction = match command {
-                "forward" => Instruction::Forward(value),
-                "down" => Instruction::Down(value),
-                "up" => Instruction::Up(value),
-                _ => unreachable!(),
-            };
-            Ok::<Instruction, Error>(instruction)
+    map(
+        separated_pair(parse_command, space1, complete::i32),
+        |(command, value)| match command {
+            "forward" => Instruction::Forward(value),
+            "down" => Instruction::Down(value),
+            "up" => Instruction::Up(value),
+            _ => unreachable!(),
         },
     )(input)
 }

@@ -1,11 +1,7 @@
-use anyhow::Result;
-use nom::{
-    character::complete::{digit1, line_ending},
-    combinator::map_res,
-    multi::separated_list1,
-    IResult,
-};
 use std::{fs, io::Read};
+
+use anyhow::Result;
+use nom::{character::complete, character::complete::line_ending, multi::separated_list1, IResult};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -37,11 +33,7 @@ fn part_two(input: &[u16]) -> usize {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<u16>> {
-    separated_list1(line_ending, parse_line)(input)
-}
-
-fn parse_line(input: &str) -> IResult<&str, u16> {
-    map_res(digit1, |num: &str| num.parse::<u16>())(input)
+    separated_list1(line_ending, complete::u16)(input)
 }
 
 fn read_input() -> Result<Vec<u16>> {

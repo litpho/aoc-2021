@@ -1,18 +1,13 @@
-use anyhow::{Error, Result};
-use nom::combinator::map_res;
+use std::{cmp::max, cmp::min, fs, io::Read};
+
+use anyhow::Result;
 use nom::{
     bytes::complete::tag,
-    character::complete::{digit1, line_ending},
+    character::complete::{self, line_ending},
     combinator::map,
     multi::separated_list1,
     sequence::separated_pair,
-    IResult,
-};
-use std::{
-    cmp::{max, min},
-    fs,
-    io::Read,
-    str::FromStr,
+    IResult, ToUsize,
 };
 
 fn main() -> Result<()> {
@@ -122,11 +117,10 @@ fn parse_line(input: &str) -> IResult<&str, Line> {
 }
 
 fn parse_point(input: &str) -> IResult<&str, (usize, usize)> {
-    map_res(separated_pair(digit1, tag(","), digit1), |(x, y)| {
-        let x = usize::from_str(x).map_err(Error::from)?;
-        let y = usize::from_str(y).map_err(Error::from)?;
-        Ok::<(usize, usize), Error>((x, y))
-    })(input)
+    map(
+        separated_pair(complete::u32, tag(","), complete::u32),
+        |(x, y)| (x.to_usize(), y.to_usize()),
+    )(input)
 }
 
 fn read_input() -> Result<Vec<Line>> {

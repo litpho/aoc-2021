@@ -1,10 +1,14 @@
+use std::{cell::RefCell, cmp::max, fs, io::Read};
+
 use anyhow::Result;
 use nom::{
-    bytes::complete::tag, character::complete::digit1, character::complete::line_ending,
-    combinator::map, multi::separated_list1, sequence::tuple, IResult,
+    bytes::complete::tag,
+    character::{complete, complete::digit1, complete::line_ending},
+    multi::separated_list1,
+    sequence::{preceded, tuple},
+    IResult,
 };
 use once_cell::sync::Lazy;
-use std::{cell::RefCell, cmp::max, fs, io::Read, str::FromStr};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -206,9 +210,9 @@ fn parse(input: &str) -> IResult<&str, Vec<u8>> {
 }
 
 fn parse_player(input: &str) -> IResult<&str, u8> {
-    map(
-        tuple((tag("Player "), digit1, tag(" starting position: "), digit1)),
-        |(_, _, _, pos)| u8::from_str(pos).unwrap(),
+    preceded(
+        tuple((tag("Player "), digit1, tag(" starting position: "))),
+        complete::u8,
     )(input)
 }
 

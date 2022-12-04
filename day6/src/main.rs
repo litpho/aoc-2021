@@ -1,9 +1,7 @@
-use anyhow::Result;
-use nom::{
-    bytes::complete::tag, character::complete::digit1, combinator::map_res, multi::separated_list1,
-    IResult,
-};
 use std::{collections::HashMap, fs, io::Read};
+
+use anyhow::Result;
+use nom::{bytes::complete::tag, character::complete, multi::separated_list1, IResult};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -48,9 +46,7 @@ fn algorithm(mut input: HashMap<i8, i64>, days: i16) -> i64 {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<i8>> {
-    map_res(separated_list1(tag(","), digit1), |numbers| {
-        numbers.into_iter().map(|num: &str| num.parse()).collect()
-    })(input)
+    separated_list1(tag(","), complete::i8)(input)
 }
 
 fn read_input() -> Result<HashMap<i8, i64>> {
