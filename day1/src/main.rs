@@ -4,7 +4,7 @@ use anyhow::Result;
 use nom::{character::complete, character::complete::line_ending, multi::separated_list1, IResult};
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = parse_input()?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {result}");
@@ -36,7 +36,7 @@ fn parse(input: &str) -> IResult<&str, Vec<u16>> {
     separated_list1(line_ending, complete::u16)(input)
 }
 
-fn read_input() -> Result<Vec<u16>> {
+fn parse_input() -> Result<Vec<u16>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
@@ -51,22 +51,14 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
-
-        let count = part_one(&input);
-
-        assert_eq!(1681, count);
+        assert_eq!(1681, part_one(&parse_input()?));
 
         Ok(())
     }
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
-
-        let count = part_two(&input);
-
-        assert_eq!(1704, count);
+        assert_eq!(1704, part_two(&parse_input()?));
 
         Ok(())
     }
