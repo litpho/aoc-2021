@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1"
-hierarchical_pathfinding = "0.5"
 nom = "7"
+pathfinding = "4"
 took = "0.1"

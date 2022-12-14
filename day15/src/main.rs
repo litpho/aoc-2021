@@ -1,122 +1,94 @@
 use anyhow::Result;
-use hierarchical_pathfinding::{prelude::ManhattanNeighborhood, PathCache, PathCacheConfig};
 use nom::{
     bytes::complete::take_while1, character::complete::line_ending, character::is_digit,
     combinator::map, combinator::map_res, multi::separated_list1, IResult,
 };
-use std::{fs, io::Read};
+use pathfinding::prelude::dijkstra;
+
+const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let input = result?;
 
-    let (took, result) = took::took(|| part_one_lib(&input));
+    let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {result}");
     println!("Time spent: {took}");
 
-    let (took, result) = took::took(|| part_two_lib(&input));
+    let (took, result) = took::took(|| part_two(&input));
     println!("Result part two: {result}");
     println!("Time spent: {took}");
 
     Ok(())
 }
 
-// fn part_one(grid: &Grid) -> usize {
-//     traverse_iteration(grid) as usize
-// }
-
-fn part_one_lib(grid: &Grid) -> usize {
-    traverse_lib(grid)
+fn part_one(grid: &Grid) -> usize {
+    traverse(grid)
 }
 
-fn part_two_lib(grid: &Grid) -> usize {
+fn part_two(grid: &Grid) -> usize {
     let grid = grid.multiply_by_5();
 
-    println!("{},{}", grid.max_x, grid.max_y);
-
-    traverse_lib(&grid)
+    traverse(&grid)
 }
 
-// fn traverse_iteration(grid: &Grid) -> i32 {
-//     let route_start: Vec<(usize, usize, i32)> = vec![(0, 0, 0)];
-//     // initialize lowest_count with diagonal. WARNING: only works with square grids
-//     let mut lowest_count: i32 = (0..=grid.max_x).map(|i| grid.cell(i, i).2).sum::<i32>()
-//         + (0..grid.max_x).map(|i| grid.cell(i, i + 1).2).sum::<i32>();
-//
-//     let mut results: Vec<Vec<(usize, usize, i32)>> = Vec::new();
-//     let mut routes: VecDeque<(Vec<(usize, usize, i32)>, HashSet<(usize, usize)>)> = VecDeque::new();
-//     routes.push_back((route_start, HashSet::new()));
-//     while !routes.is_empty() {
-//         let (route, visited) = routes.pop_front().unwrap();
-//         let route = route.clone();
-//
-//         let mut visited = visited.clone();
-//         let (x, y, last_val) = route.last().unwrap();
-//         visited.insert((*x, *y));
-//         for (a, b) in grid.get_neighbours(*x, *y) {
-//             if visited.contains(&(a, b)) {
-//                 continue;
-//             }
-//
-//             let (a, b, val) = grid.cell(a, b);
-//
-//             if *last_val + val > lowest_count {
-//                 continue;
-//             }
-//
-//             if a > grid.max_x - 2 || b > grid.max_y - 2 {
-//                 println!("{a},{b} - {}: {lowest_count}", routes.len());
-//             }
-//
-//             // println!("{x},{y}:{a},{b} ({lowest_count},{}) - {:?}", routes.len(), route);
-//
-//             if a == grid.max_x && b == grid.max_y {
-//                 println!("Bingo! {}: {lowest_count} < {}", routes.len(), *last_val + val);
-//                 if lowest_count > *last_val + val {
-//                     lowest_count = *last_val + val;
-//                 }
-//
-//                 let mut new_route = route.to_vec();
-//                 new_route.push((a, b, *last_val + val));
-//                 results.push(new_route);
-//             } else {
-//                 let mut new_route = route.to_vec();
-//                 new_route.push((a, b, *last_val + val));
-//                 let mut new_visited = visited.to_owned();
-//                 new_visited.insert((a, b));
-//                 routes.push_front((new_route, new_visited));
-//             }
-//         }
-//     }
-//
-//     lowest_count
-// }
-
-fn traverse_lib(grid: &Grid) -> usize {
-    let pathfinding = PathCache::new(
-        (grid.max_x + 1, grid.max_y + 1),
-        |(x, y)| grid.cell(x, y).2 as isize,
-        ManhattanNeighborhood::new(grid.max_x + 1, grid.max_y + 1),
-        PathCacheConfig::with_chunk_size(1),
-    );
-
+fn traverse(grid: &Grid) -> usize {
     let start = (0, 0);
     let goal = (grid.max_x, grid.max_y);
 
-    // find_path returns Some(Path) on success
-    let path = pathfinding.find_path(start, goal, |(x, y)| grid.cell(x, y).2 as isize);
+    let (_, cost) = dijkstra(&start, |(x, y)| next_steps(grid, x, y), |p| *p == goal).unwrap();
 
-    if let Some(path) = path {
-        let cost =
-            path.cost() - grid.cell(0, 0).2 as usize + grid.cell(grid.max_x, grid.max_y).2 as usize;
-        println!("Number of steps: {}", path.length());
-        println!("Total Cost: {cost}");
-        // for (x, y) in path {
-        //     println!("Go to {x}, {y}");
-        // }
-        return cost;
+    (cost - grid.cell(0, 0).2 + grid.cell(grid.max_x, grid.max_y).2) as usize
+}
+
+fn next_steps(grid: &Grid, x: &usize, y: &usize) -> Vec<((usize, usize), i32)> {
+    let width = grid.max_x;
+    let height = grid.max_y;
+
+    let mut next_steps = vec![];
+
+    // up
+    calculate_step(&(*x, *y), &mut next_steps, grid, *y > 0, |s| s, |s| s - 1);
+    // down
+    calculate_step(
+        &(*x, *y),
+        &mut next_steps,
+        grid,
+        *y < height,
+        |s| s,
+        |s| s + 1,
+    );
+    // left
+    calculate_step(&(*x, *y), &mut next_steps, grid, *x > 0, |s| s - 1, |s| s);
+    // right
+    calculate_step(
+        &(*x, *y),
+        &mut next_steps,
+        grid,
+        *x < width,
+        |s| s + 1,
+        |s| s,
+    );
+
+    next_steps
+}
+
+fn calculate_step<G, H>(
+    coord: &(usize, usize),
+    next_steps: &mut Vec<((usize, usize), i32)>,
+    grid: &Grid,
+    condition: bool,
+    x: G,
+    y: H,
+) where
+    G: Fn(usize) -> usize,
+    H: Fn(usize) -> usize,
+{
+    if condition {
+        let new_coord = (x(coord.0), y(coord.1));
+        next_steps.push((new_coord, grid.cell(coord.0, coord.1).2));
     }
-
-    0
 }
 
 struct Grid {
@@ -139,28 +111,6 @@ impl Grid {
     pub fn cell(&self, x: usize, y: usize) -> (usize, usize, i32) {
         (x, y, *self.content.get(y).unwrap().get(x).unwrap())
     }
-
-    // pub fn get_neighbours(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
-    //     let mut result: Vec<(usize, usize)> = Vec::new();
-    //     // println!("{x},{y}: {} > {} = {}", self.max_y - y, self.max_x - x, self.max_y - y > self.max_x - x);
-    //     if x < self.max_x {
-    //         result.push((x + 1, y));
-    //     }
-    //     if y < self.max_y {
-    //         result.push((x, y + 1));
-    //     }
-    //     if self.max_y - y > self.max_x - x {
-    //         // try for a diagonal from top left to bottom right as much as possible, favouring x over y
-    //         result.reverse();
-    //     }
-    //     if x > 0 {
-    //         result.push((x - 1, y));
-    //     }
-    //     if y > 0 {
-    //         result.push((x, y - 1));
-    //     }
-    //     result
-    // }
 
     pub fn multiply_by_5(&self) -> Self {
         let mut result: Vec<Vec<i32>> = Vec::new();
@@ -199,11 +149,8 @@ fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<i32>> {
     })(input)
 }
 
-fn read_input() -> Result<Grid> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(buf.as_bytes()).expect("Parse failure");
+fn parse_input(input: &'static str) -> Result<Grid> {
+    let (_, input) = parse(input.as_bytes()).expect("Parse failure");
 
     Ok(input)
 }
@@ -212,24 +159,32 @@ fn read_input() -> Result<Grid> {
 mod tests {
     use super::*;
 
+    const TESTDATA: &str = include_str!("test.txt");
+
+    #[test]
+    fn test_part_one_testdata() -> Result<()> {
+        assert_eq!(40, part_one(&parse_input(TESTDATA)?));
+
+        Ok(())
+    }
+
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        assert_eq!(503, part_one(&parse_input(DATA)?));
 
-        let result = part_one_lib(&input);
+        Ok(())
+    }
 
-        assert_eq!(503, result);
+    #[test]
+    fn test_part_two_testdata() -> Result<()> {
+        assert_eq!(315, part_two(&parse_input(TESTDATA)?));
 
         Ok(())
     }
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
-
-        let count = part_two_lib(&input);
-
-        assert_eq!(2853, count);
+        assert_eq!(2853, part_two(&parse_input(DATA)?));
 
         Ok(())
     }
