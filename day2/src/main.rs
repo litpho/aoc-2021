@@ -1,18 +1,20 @@
-use std::{fs, io::Read};
-
 use anyhow::Result;
-use nom::multi::separated_list1;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::{complete, complete::line_ending, complete::space1},
+    character::complete::{self, line_ending, space1},
     combinator::map,
+    multi::separated_list1,
     sequence::separated_pair,
     IResult,
 };
 
+const DATA: &str = include_str!("input.txt");
+
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let input = result?;
 
     let (took, (x, depth)) = took::took(|| part_one(&input));
     println!("Result part one: {x} / {depth} = {}", x * depth);
@@ -75,11 +77,8 @@ fn parse_command(input: &str) -> IResult<&str, &str> {
     alt((tag("forward"), tag("down"), tag("up")))(input)
 }
 
-fn read_input() -> Result<Vec<Instruction>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn parse_input(input: &'static str) -> Result<Vec<Instruction>> {
+    let (_, input) = parse(input)?;
 
     Ok(input)
 }
@@ -94,11 +93,21 @@ enum Instruction {
 mod tests {
     use super::*;
 
+    const TESTDATA: &str = include_str!("test.txt");
+
+    #[test]
+    fn test_part_one_testdata() -> Result<()> {
+        let (x, depth) = part_one(&parse_input(TESTDATA)?);
+
+        assert_eq!(15, x);
+        assert_eq!(10, depth);
+
+        Ok(())
+    }
+
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
-
-        let (x, depth) = part_one(&input);
+        let (x, depth) = part_one(&parse_input(DATA)?);
 
         assert_eq!(1967, x);
         assert_eq!(1031, depth);
@@ -107,10 +116,18 @@ mod tests {
     }
 
     #[test]
-    fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+    fn test_part_two_testdata() -> Result<()> {
+        let (x, depth) = part_two(&parse_input(TESTDATA)?);
 
-        let (x, depth) = part_two(&input);
+        assert_eq!(15, x);
+        assert_eq!(60, depth);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_part_two() -> Result<()> {
+        let (x, depth) = part_two(&parse_input(DATA)?);
 
         assert_eq!(1967, x);
         assert_eq!(967791, depth);

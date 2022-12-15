@@ -1,14 +1,19 @@
+use std::{cmp::Ordering, collections::HashMap};
+
 use anyhow::{Error, Result};
 use nom::{
     branch::alt,
     character::complete::{self, line_ending},
-    multi::{count, separated_list1},
+    multi::{many1, separated_list1},
     IResult,
 };
-use std::{cmp::Ordering, collections::HashMap, fs, io::Read};
+
+const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let input = result?;
 
     let (took, result) = took::took(|| part_one(&input));
     let (gamma, epsilon) = result?;
@@ -113,18 +118,15 @@ fn parse(input: &str) -> IResult<&str, Vec<Vec<char>>> {
 }
 
 fn parse_line(input: &str) -> IResult<&str, Vec<char>> {
-    count(parse_binary_digit, 12)(input)
+    many1(parse_binary_digit)(input)
 }
 
 fn parse_binary_digit(input: &str) -> IResult<&str, char> {
     alt((complete::char('0'), complete::char('1')))(input)
 }
 
-fn read_input() -> Result<Vec<Vec<char>>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn parse_input(input: &'static str) -> Result<Vec<Vec<char>>> {
+    let (_, input) = parse(input)?;
 
     Ok(input)
 }
@@ -133,11 +135,21 @@ fn read_input() -> Result<Vec<Vec<char>>> {
 mod tests {
     use super::*;
 
+    const TESTDATA: &str = include_str!("test.txt");
+
+    #[test]
+    fn test_part_one_testdata() -> Result<()> {
+        let (gamma, epsilon) = part_one(&parse_input(TESTDATA)?)?;
+
+        assert_eq!(22, gamma);
+        assert_eq!(9, epsilon);
+
+        Ok(())
+    }
+
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
-
-        let (gamma, epsilon) = part_one(&input)?;
+        let (gamma, epsilon) = part_one(&parse_input(DATA)?)?;
 
         assert_eq!(1491, gamma);
         assert_eq!(2604, epsilon);
@@ -146,10 +158,18 @@ mod tests {
     }
 
     #[test]
-    fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+    fn test_part_two_testdata() -> Result<()> {
+        let (oxygen, co2) = part_two(parse_input(TESTDATA)?)?;
 
-        let (oxygen, co2) = part_two(input)?;
+        assert_eq!(23, oxygen);
+        assert_eq!(10, co2);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_part_two() -> Result<()> {
+        let (oxygen, co2) = part_two(parse_input(DATA)?)?;
 
         assert_eq!(1305, oxygen);
         assert_eq!(2594, co2);

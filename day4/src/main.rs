@@ -1,17 +1,23 @@
-use std::{collections::HashMap, fs, io::Read, ops::Rem};
+use std::{collections::HashMap, ops::Rem};
 
 use anyhow::Result;
+use nom::character::complete::space0;
+use nom::sequence::delimited;
 use nom::{
     branch::alt,
-    character::{complete, complete::line_ending, complete::space1},
+    character::complete::{self, line_ending, space1},
     combinator::{eof, map},
     multi::{count, separated_list1},
     sequence::{separated_pair, terminated},
     IResult,
 };
 
+const DATA: &str = include_str!("input.txt");
+
 fn main() -> Result<()> {
-    let (called_numbers, mut cards) = read_input()?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let (called_numbers, mut cards) = result?;
 
     let (took, result) = took::took(|| {
         let mut cards = cards.clone();
@@ -67,7 +73,7 @@ fn part_two(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, u32)> {
     None
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 struct Card {
     numbers: Vec<u8>,
     marked: HashMap<usize, bool>,
@@ -135,17 +141,15 @@ fn parse_card(input: &str) -> IResult<&str, Card> {
 }
 
 fn parse_card_line(input: &str) -> IResult<&str, Vec<u8>> {
-    terminated(
+    delimited(
+        space0,
         separated_list1(space1, complete::u8),
         alt((line_ending, eof)),
     )(input)
 }
 
-fn read_input() -> Result<(Vec<u8>, Vec<Card>)> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, (called_numbers, cards)) = parse(&buf).expect("Parse failure");
+fn parse_input(input: &'static str) -> Result<(Vec<u8>, Vec<Card>)> {
+    let (_, (called_numbers, cards)) = parse(input)?;
 
     Ok((called_numbers, cards))
 }
@@ -154,9 +158,25 @@ fn read_input() -> Result<(Vec<u8>, Vec<Card>)> {
 mod tests {
     use super::*;
 
+    const TESTDATA: &str = include_str!("test.txt");
+
+    #[test]
+    #[ignore]
+    fn test_part_one_testdata() -> Result<()> {
+        let (called_numbers, mut cards) = parse_input(TESTDATA)?;
+
+        let (called_number, card_sum) =
+            part_one(&called_numbers, &mut cards).expect("No result found");
+
+        assert_eq!(24, called_number);
+        assert_eq!(188, card_sum);
+
+        Ok(())
+    }
+
     #[test]
     fn test_part_one() -> Result<()> {
-        let (called_numbers, mut cards) = read_input()?;
+        let (called_numbers, mut cards) = parse_input(DATA)?;
 
         let (called_number, card_sum) =
             part_one(&called_numbers, &mut cards).expect("No result found");
@@ -168,8 +188,22 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
+    fn test_part_two_testdata() -> Result<()> {
+        let (called_numbers, mut cards) = parse_input(TESTDATA)?;
+
+        let (called_number, card_sum) =
+            part_two(&called_numbers, &mut cards).expect("No result found");
+
+        assert_eq!(13, called_number);
+        assert_eq!(148, card_sum);
+
+        Ok(())
+    }
+
+    #[test]
     fn test_part_two() -> Result<()> {
-        let (called_numbers, mut cards) = read_input()?;
+        let (called_numbers, mut cards) = parse_input(DATA)?;
 
         let (called_number, card_sum) =
             part_two(&called_numbers, &mut cards).expect("No result found");
