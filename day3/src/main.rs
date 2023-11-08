@@ -2,8 +2,7 @@ use std::{cmp::Ordering, collections::HashMap};
 
 use anyhow::{Error, Result};
 use nom::{
-    branch::alt,
-    character::complete::{self, line_ending},
+    character::{complete::line_ending, complete::one_of},
     multi::{many1, separated_list1},
     IResult,
 };
@@ -51,7 +50,6 @@ fn get_row_as_decimal(
     function: fn(&[Vec<char>], usize) -> Result<char>,
 ) -> Result<isize> {
     let output = (0..input[0].len())
-        .into_iter()
         .map(|x| function(input, x))
         .try_fold(String::new(), |acc, c| {
             Ok::<String, Error>(acc + c?.to_string().as_str())
@@ -118,11 +116,7 @@ fn parse(input: &str) -> IResult<&str, Vec<Vec<char>>> {
 }
 
 fn parse_line(input: &str) -> IResult<&str, Vec<char>> {
-    many1(parse_binary_digit)(input)
-}
-
-fn parse_binary_digit(input: &str) -> IResult<&str, char> {
-    alt((complete::char('0'), complete::char('1')))(input)
+    many1(one_of("01"))(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Vec<char>>> {
