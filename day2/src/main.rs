@@ -2,10 +2,10 @@ use anyhow::Result;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::{self, line_ending, space1},
+    character::complete::{self, line_ending},
     combinator::map,
     multi::separated_list1,
-    sequence::separated_pair,
+    sequence::preceded,
     IResult,
 };
 
@@ -28,33 +28,33 @@ fn main() -> Result<()> {
 }
 
 fn part_one(input: &[Instruction]) -> (i32, i32) {
-    let mut x: i32 = 0;
-    let mut depth: i32 = 0;
+    input
+        .iter()
+        .fold((0, 0), |(x, depth), instruction| match instruction {
+            Instruction::Forward(value) => (x + value, depth),
+            Instruction::Down(value) => (x, depth + value),
+            Instruction::Up(value) => (x, depth - value),
+        })
+}
 
-    input.iter().for_each(|instruction| match instruction {
-        Instruction::Forward(value) => x += value,
-        Instruction::Down(value) => depth += value,
-        Instruction::Up(value) => depth -= value,
-    });
+fn part_two(input: &[Instruction]) -> (i32, i32) {
+    let (x, depth, _) =
+        input.iter().fold(
+            (0, 0, 0),
+            |(x, depth, aim), instruction| match instruction {
+                Instruction::Forward(value) => (x + value, depth + aim * value, aim),
+                Instruction::Down(value) => (x, depth, aim + value),
+                Instruction::Up(value) => (x, depth, aim - value),
+            },
+        );
 
     (x, depth)
 }
 
-fn part_two(input: &[Instruction]) -> (i32, i32) {
-    let mut x: i32 = 0;
-    let mut depth: i32 = 0;
-    let mut aim: i32 = 0;
-
-    input.iter().for_each(|instruction| match instruction {
-        Instruction::Forward(value) => {
-            x += value;
-            depth += aim * value
-        }
-        Instruction::Down(value) => aim += value,
-        Instruction::Up(value) => aim -= value,
-    });
-
-    (x, depth)
+enum Instruction {
+    Forward(i32),
+    Down(i32),
+    Up(i32),
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
@@ -62,31 +62,31 @@ fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
 }
 
 fn parse_line(input: &str) -> IResult<&str, Instruction> {
-    map(
-        separated_pair(parse_command, space1, complete::i32),
-        |(command, value)| match command {
-            "forward" => Instruction::Forward(value),
-            "down" => Instruction::Down(value),
-            "up" => Instruction::Up(value),
-            _ => unreachable!(),
-        },
-    )(input)
+    alt((parse_forward, parse_down, parse_up))(input)
 }
 
-fn parse_command(input: &str) -> IResult<&str, &str> {
-    alt((tag("forward"), tag("down"), tag("up")))(input)
+fn parse_forward(input: &str) -> IResult<&str, Instruction> {
+    map(preceded(tag("forward "), complete::i32), |value| {
+        Instruction::Forward(value)
+    })(input)
+}
+
+fn parse_down(input: &str) -> IResult<&str, Instruction> {
+    map(preceded(tag("down "), complete::i32), |value| {
+        Instruction::Down(value)
+    })(input)
+}
+
+fn parse_up(input: &str) -> IResult<&str, Instruction> {
+    map(preceded(tag("up "), complete::i32), |value| {
+        Instruction::Up(value)
+    })(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Instruction>> {
     let (_, input) = parse(input)?;
 
     Ok(input)
-}
-
-enum Instruction {
-    Forward(i32),
-    Down(i32),
-    Up(i32),
 }
 
 #[cfg(test)]
