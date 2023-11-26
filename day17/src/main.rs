@@ -37,8 +37,7 @@ fn part_two(input: &TargetArea) -> usize {
 
 fn get_hit_velocities_and_heights(input: &TargetArea) -> Vec<(i32, i32, i32)> {
     (-500..500)
-        .into_iter()
-        .flat_map(|x| (-500..500).into_iter().map(move |y| (x, y)))
+        .flat_map(|x| (-500..500).map(move |y| (x, y)))
         .filter_map(|(x, y)| input.height_and_then_hit(x, y))
         .collect::<Vec<(i32, i32, i32)>>()
 }

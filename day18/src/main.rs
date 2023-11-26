@@ -207,7 +207,7 @@ fn parse_tuple(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Number>> {
                 separated_pair(parse_value(depth), complete::char(','), parse_value(depth)),
                 complete::char(']'),
             ),
-            |(x, y)| vec![x, y].concat(),
+            |(x, y)| [x, y].concat(),
         )(input)
     }
 }

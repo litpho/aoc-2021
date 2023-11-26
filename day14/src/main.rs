@@ -11,33 +11,33 @@ use nom::{
 use std::{collections::HashMap, fs, io::Read};
 
 fn main() -> Result<()> {
-    let (template, rules) = read_input()?;
+    let input = read_input()?;
 
-    let (took, result) = took::took(|| part_one(template.clone(), &rules));
+    let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {result}");
     println!("Time spent: {took}");
 
-    let (took, result) = took::took(|| part_two(template, &rules));
+    let (took, result) = took::took(|| part_two(&input));
     println!("Result part two: {result}");
     println!("Time spent: {took}");
 
     Ok(())
 }
 
-fn part_one(template: String, rules: &HashMap<(char, char), char>) -> i64 {
-    execute(template, rules, 10)
+fn part_one(input: &Input) -> i64 {
+    execute(input, 10)
 }
 
-fn part_two(template: String, rules: &HashMap<(char, char), char>) -> i64 {
-    execute(template, rules, 40)
+fn part_two(input: &Input) -> i64 {
+    execute(input, 40)
 }
 
-fn execute(template: String, rules: &HashMap<(char, char), char>, amount: usize) -> i64 {
-    let combinations = determine_possible_combinations(rules);
-    let input = initialize_input(&template);
-    let result = (0..amount).fold(input, |s, _| step(&s, &combinations));
+fn execute(input: &Input, amount: usize) -> i64 {
+    let combinations = determine_possible_combinations(&input.rules);
+    let initialized_input = initialize_input(&input.template);
+    let result = (0..amount).fold(initialized_input, |s, _| step(&s, &combinations));
 
-    let (least, most) = least_most(&template, &result);
+    let (least, most) = least_most(&input.template, &result);
 
     most - least
 }
@@ -98,8 +98,16 @@ fn least_most(template: &str, input: &HashMap<(char, char), i64>) -> (i64, i64) 
     (*result.first().unwrap(), *result.last().unwrap())
 }
 
-fn parse(input: &str) -> IResult<&str, (String, HashMap<(char, char), char>)> {
-    separated_pair(parse_template, count(line_ending, 2), parse_insertion_rules)(input)
+struct Input {
+    template: String,
+    rules: HashMap<(char, char), char>,
+}
+
+fn parse(input: &str) -> IResult<&str, Input> {
+    map(
+        separated_pair(parse_template, count(line_ending, 2), parse_insertion_rules),
+        |(template, rules)| Input { template, rules },
+    )(input)
 }
 
 fn parse_template(input: &str) -> IResult<&str, String> {
@@ -127,7 +135,7 @@ fn parse_insertion_rule(input: &str) -> IResult<&str, (&str, &str)> {
     separated_pair(alpha1, tag(" -> "), alpha1)(input)
 }
 
-fn read_input() -> Result<(String, HashMap<(char, char), char>)> {
+fn read_input() -> Result<Input> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
@@ -142,9 +150,9 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let (template, rules) = read_input()?;
+        let input = read_input()?;
 
-        let count = part_one(template, &rules);
+        let count = part_one(&input);
 
         assert_eq!(2010, count);
 
@@ -153,9 +161,9 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let (template, rules) = read_input()?;
+        let input = read_input()?;
 
-        let count = part_two(template, &rules);
+        let count = part_two(&input);
 
         assert_eq!(2437698971143, count);
 
