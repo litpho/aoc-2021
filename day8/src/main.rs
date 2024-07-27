@@ -1,4 +1,4 @@
-use std::{cmp::Reverse, collections::HashMap, fs, io::Read};
+use std::{cmp::Reverse, collections::HashMap, fs, io::Read, sync::LazyLock};
 
 use anyhow::Result;
 use nom::{
@@ -9,9 +9,8 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
-use once_cell::sync::Lazy;
 
-static BYTEMAP: Lazy<HashMap<char, u8>> = Lazy::new(|| {
+static BYTEMAP: LazyLock<HashMap<char, u8>> = LazyLock::new(|| {
     HashMap::from([
         ('a', 1),
         ('b', 2),

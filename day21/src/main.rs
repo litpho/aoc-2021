@@ -1,5 +1,3 @@
-use std::{cell::RefCell, cmp::max, fs, io::Read};
-
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
@@ -8,7 +6,7 @@ use nom::{
     sequence::{preceded, tuple},
     IResult,
 };
-use once_cell::sync::Lazy;
+use std::{cell::RefCell, cmp::max, fs, io::Read, sync::LazyLock};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -83,8 +81,8 @@ fn part_two(input: Vec<u8>) -> u64 {
     max(games_won_one, games_won_two)
 }
 
-static DISTRIBUTION: Lazy<Vec<(u8, u8)>> =
-    Lazy::new(|| vec![(1, 3), (3, 4), (6, 5), (7, 6), (6, 7), (3, 8), (1, 9)]);
+static DISTRIBUTION: LazyLock<Vec<(u8, u8)>> =
+    LazyLock::new(|| vec![(1, 3), (3, 4), (6, 5), (7, 6), (6, 7), (3, 8), (1, 9)]);
 
 #[derive(Clone, Debug)]
 struct Universe {
