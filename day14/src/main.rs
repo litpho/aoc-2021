@@ -3,10 +3,9 @@ use nom::{
     bytes::complete::tag,
     character::complete::{alpha1, line_ending},
     combinator::map,
-    multi::count,
-    multi::separated_list1,
+    multi::{count, separated_list1},
     sequence::separated_pair,
-    IResult,
+    IResult, Parser,
 };
 use std::{collections::HashMap, fs, io::Read};
 
@@ -107,11 +106,12 @@ fn parse(input: &str) -> IResult<&str, Input> {
     map(
         separated_pair(parse_template, count(line_ending, 2), parse_insertion_rules),
         |(template, rules)| Input { template, rules },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_template(input: &str) -> IResult<&str, String> {
-    map(alpha1, |s: &str| s.to_string())(input)
+    map(alpha1, |s: &str| s.to_string()).parse(input)
 }
 
 fn parse_insertion_rules(input: &str) -> IResult<&str, HashMap<(char, char), char>> {
@@ -128,11 +128,12 @@ fn parse_insertion_rules(input: &str) -> IResult<&str, HashMap<(char, char), cha
                 })
                 .collect::<HashMap<(char, char), char>>()
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_insertion_rule(input: &str) -> IResult<&str, (&str, &str)> {
-    separated_pair(alpha1, tag(" -> "), alpha1)(input)
+    separated_pair(alpha1, tag(" -> "), alpha1).parse(input)
 }
 
 fn read_input() -> Result<Input> {

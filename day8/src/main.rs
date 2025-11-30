@@ -1,5 +1,3 @@
-use std::{cmp::Reverse, collections::HashMap, fs, io::Read, sync::LazyLock};
-
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
@@ -7,8 +5,9 @@ use nom::{
     combinator::map,
     multi::separated_list1,
     sequence::separated_pair,
-    IResult,
+    IResult, Parser,
 };
+use std::{cmp::Reverse, collections::HashMap, fs, io::Read, sync::LazyLock};
 
 static BYTEMAP: LazyLock<HashMap<char, u8>> = LazyLock::new(|| {
     HashMap::from([
@@ -165,19 +164,19 @@ impl Group {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<(Groups, Groups)>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, (Groups, Groups)> {
-    separated_pair(parse_groups, tag(" | "), parse_groups)(input)
+    separated_pair(parse_groups, tag(" | "), parse_groups).parse(input)
 }
 
 fn parse_groups(input: &str) -> IResult<&str, Groups> {
-    map(separated_list1(space1, parse_group), Groups::new)(input)
+    map(separated_list1(space1, parse_group), Groups::new).parse(input)
 }
 
 fn parse_group(input: &str) -> IResult<&str, Group> {
-    map(alpha1, Group::new)(input)
+    map(alpha1, Group::new).parse(input)
 }
 
 fn read_input() -> Result<Vec<(Groups, Groups)>> {

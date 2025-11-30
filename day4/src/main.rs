@@ -1,16 +1,13 @@
-use std::{collections::HashMap, ops::Rem};
-
 use anyhow::Result;
-use nom::character::complete::space0;
-use nom::sequence::delimited;
 use nom::{
     branch::alt,
-    character::complete::{self, line_ending, space1},
+    character::complete::{self, line_ending, space0, space1},
     combinator::{eof, map},
     multi::{count, separated_list1},
-    sequence::{separated_pair, terminated},
-    IResult,
+    sequence::{delimited, separated_pair, terminated},
+    IResult, Parser,
 };
+use std::{collections::HashMap, ops::Rem};
 
 const DATA: &str = include_str!("input.txt");
 
@@ -42,10 +39,10 @@ fn main() -> Result<()> {
 fn part_one(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, u32)> {
     for called_number in called_numbers {
         for card in cards.iter_mut() {
-            if let Some(pos) = card.mark(called_number) {
-                if card.bingo(pos) {
-                    return Some((*called_number, card.sum()));
-                }
+            if let Some(pos) = card.mark(called_number)
+                && card.bingo(pos)
+            {
+                return Some((*called_number, card.sum()));
             }
         }
     }
@@ -57,14 +54,13 @@ fn part_two(called_numbers: &[u8], cards: &mut [Card]) -> Option<(u8, u32)> {
     let mut won_cards: Vec<Card> = Vec::new();
     for called_number in called_numbers {
         for card in cards.iter_mut() {
-            if !won_cards.contains(card) {
-                if let Some(pos) = card.mark(called_number) {
-                    if card.bingo(pos) {
-                        won_cards.push(card.clone());
-                        if won_cards.len() == 100 {
-                            return Some((*called_number, card.sum()));
-                        }
-                    }
+            if !won_cards.contains(card)
+                && let Some(pos) = card.mark(called_number)
+                && card.bingo(pos)
+            {
+                won_cards.push(card.clone());
+                if won_cards.len() == 100 {
+                    return Some((*called_number, card.sum()));
                 }
             }
         }
@@ -98,12 +94,9 @@ impl Card {
 
     pub fn bingo(&self, position: usize) -> bool {
         let horizontal = (position.div_euclid(5) * 5 + 1..position.div_euclid(5) * 5 + 5)
-            .map(|pos| self.marked[&pos])
-            .all(|mark| mark);
+            .all(|pos| self.marked[&pos]);
         let rem = position.rem(5);
-        let vertical = (0..5)
-            .map(|pos| self.marked[&(pos * 5 + rem)])
-            .all(|mark| mark);
+        let vertical = (0..5).all(|pos| self.marked[&(pos * 5 + rem)]);
 
         horizontal || vertical
     }
@@ -119,25 +112,27 @@ impl Card {
 }
 
 fn parse(input: &str) -> IResult<&str, (Vec<u8>, Vec<Card>)> {
-    separated_pair(parse_called_numbers, line_ending, parse_cards)(input)
+    separated_pair(parse_called_numbers, line_ending, parse_cards).parse(input)
 }
 
 fn parse_called_numbers(input: &str) -> IResult<&str, Vec<u8>> {
     terminated(
         separated_list1(complete::char(','), complete::u8),
         line_ending,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_cards(input: &str) -> IResult<&str, Vec<Card>> {
-    separated_list1(line_ending, parse_card)(input)
+    separated_list1(line_ending, parse_card).parse(input)
 }
 
 fn parse_card(input: &str) -> IResult<&str, Card> {
     map(count(parse_card_line, 5), |x| {
         let numbers = x.into_iter().flatten().collect::<Vec<u8>>();
         Card::new(numbers)
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_card_line(input: &str) -> IResult<&str, Vec<u8>> {
@@ -145,7 +140,8 @@ fn parse_card_line(input: &str) -> IResult<&str, Vec<u8>> {
         space0,
         separated_list1(space1, complete::u8),
         alt((line_ending, eof)),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<(Vec<u8>, Vec<Card>)> {

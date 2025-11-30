@@ -6,7 +6,7 @@ use nom::{
     combinator::map,
     multi::separated_list1,
     sequence::preceded,
-    IResult,
+    IResult, Parser,
 };
 
 const DATA: &str = include_str!("input.txt");
@@ -58,29 +58,32 @@ enum Instruction {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Instruction> {
-    alt((parse_forward, parse_down, parse_up))(input)
+    alt((parse_forward, parse_down, parse_up)).parse(input)
 }
 
 fn parse_forward(input: &str) -> IResult<&str, Instruction> {
     map(preceded(tag("forward "), complete::i32), |value| {
         Instruction::Forward(value)
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_down(input: &str) -> IResult<&str, Instruction> {
     map(preceded(tag("down "), complete::i32), |value| {
         Instruction::Down(value)
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_up(input: &str) -> IResult<&str, Instruction> {
     map(preceded(tag("up "), complete::i32), |value| {
         Instruction::Up(value)
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Instruction>> {

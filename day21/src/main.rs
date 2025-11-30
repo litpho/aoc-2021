@@ -3,8 +3,8 @@ use nom::{
     bytes::complete::tag,
     character::{complete, complete::digit1, complete::line_ending},
     multi::separated_list1,
-    sequence::{preceded, tuple},
-    IResult,
+    sequence::preceded,
+    IResult, Parser,
 };
 use std::{cell::RefCell, cmp::max, fs, io::Read, sync::LazyLock};
 
@@ -204,14 +204,15 @@ impl Die {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<u8>> {
-    separated_list1(line_ending, parse_player)(input)
+    separated_list1(line_ending, parse_player).parse(input)
 }
 
 fn parse_player(input: &str) -> IResult<&str, u8> {
     preceded(
-        tuple((tag("Player "), digit1, tag(" starting position: "))),
+        (tag("Player "), digit1, tag(" starting position: ")),
         complete::u8,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn read_input() -> Result<Vec<u8>> {

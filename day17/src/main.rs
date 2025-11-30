@@ -1,13 +1,12 @@
-use std::{fs, io::Read};
-
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
     character::complete,
     combinator::{map, opt},
-    sequence::{pair, separated_pair, tuple},
-    IResult,
+    sequence::{pair, separated_pair},
+    IResult, Parser,
 };
+use std::{fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -102,18 +101,19 @@ impl TargetArea {
 
 fn parse(input: &str) -> IResult<&str, TargetArea> {
     map(
-        tuple((
+        (
             tag("target area: x="),
             parse_range,
             tag(", y="),
             parse_range,
-        )),
+        ),
         |(_, x_range, _, y_range)| TargetArea::new(x_range, y_range),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_range(input: &str) -> IResult<&str, (i32, i32)> {
-    separated_pair(parse_number, tag(".."), parse_number)(input)
+    separated_pair(parse_number, tag(".."), parse_number).parse(input)
 }
 
 fn parse_number(input: &str) -> IResult<&str, i32> {
@@ -123,7 +123,8 @@ fn parse_number(input: &str) -> IResult<&str, i32> {
             let multiplier = if negative.is_some() { -1 } else { 1 };
             multiplier * number
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn read_input() -> Result<TargetArea> {

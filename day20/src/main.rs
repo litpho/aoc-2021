@@ -1,12 +1,10 @@
 use anyhow::Result;
 use nom::{
-    character::complete::line_ending,
-    character::complete::one_of,
+    character::complete::{line_ending, one_of},
     combinator::map,
-    multi::separated_list1,
-    multi::{count, many1},
+    multi::{count, many1, separated_list1},
     sequence::separated_pair,
-    IResult,
+    IResult, Parser,
 };
 use std::{collections::HashSet, fs, io::Read};
 
@@ -64,7 +62,11 @@ impl Grid {
 
     fn enhance(&mut self, key: &[bool]) {
         self.attempt += 1;
-        let def_value = if self.attempt % 2 == 0 { "1" } else { "0" };
+        let def_value = if self.attempt.is_multiple_of(2) {
+            "1"
+        } else {
+            "0"
+        };
         let default = if *key.first().unwrap() {
             def_value
         } else {
@@ -122,11 +124,11 @@ impl Grid {
 }
 
 fn parse(input: &[u8]) -> IResult<&[u8], (Vec<bool>, Grid)> {
-    separated_pair(parse_line, count(line_ending, 2), parse_image)(input)
+    separated_pair(parse_line, count(line_ending, 2), parse_image).parse(input)
 }
 
 fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<bool>> {
-    many1(map(one_of("#."), |c| c == '#'))(input)
+    many1(map(one_of("#."), |c| c == '#')).parse(input)
 }
 
 fn parse_image(input: &[u8]) -> IResult<&[u8], Grid> {
@@ -139,8 +141,9 @@ fn parse_image(input: &[u8]) -> IResult<&[u8], Grid> {
                 }
             }
         }
-        Grid::new(pixels, v.get(0).unwrap().len() as isize, v.len() as isize)
-    })(input)
+        Grid::new(pixels, v.first().unwrap().len() as isize, v.len() as isize)
+    })
+    .parse(input)
 }
 
 fn read_input() -> Result<(Vec<bool>, Grid)> {

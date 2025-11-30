@@ -1,11 +1,10 @@
-use std::{cmp::Ordering, collections::HashMap};
-
 use anyhow::{Error, Result};
 use nom::{
-    character::{complete::line_ending, complete::one_of},
+    character::complete::{line_ending, one_of},
     multi::{many1, separated_list1},
-    IResult,
+    IResult, Parser,
 };
+use std::{cmp::Ordering, collections::HashMap};
 
 const DATA: &str = include_str!("input.txt");
 
@@ -112,11 +111,11 @@ fn get_row_values(input: &[Vec<char>], column: usize) -> HashMap<char, usize> {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Vec<char>>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Vec<char>> {
-    many1(one_of("01"))(input)
+    many1(one_of("01")).parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Vec<char>>> {

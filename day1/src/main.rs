@@ -1,5 +1,9 @@
 use anyhow::Result;
-use nom::{character::complete, character::complete::line_ending, multi::separated_list1, IResult};
+use nom::{
+    character::complete::{self, line_ending},
+    multi::separated_list1,
+    IResult, Parser,
+};
 
 const DATA: &str = include_str!("input.txt");
 
@@ -35,7 +39,7 @@ fn part_two(input: &[u16]) -> usize {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<u16>> {
-    separated_list1(line_ending, complete::u16)(input)
+    separated_list1(line_ending, complete::u16).parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<u16>> {

@@ -1,15 +1,14 @@
-use std::{fs, io::Read};
-
 use anyhow::Result;
 use nom::{
     branch::alt,
     bytes::complete::{tag, take, take_while1},
-    character::{complete, is_hex_digit},
+    character::complete,
     combinator::map,
     multi::{count, many1, many_till},
     sequence::{pair, preceded},
-    AsChar, IResult,
+    AsChar, IResult, Parser,
 };
+use std::{fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -59,10 +58,14 @@ impl Packet {
             1 => subpackets.iter().map(|s| s.content).product::<u64>(),
             2 => subpackets.iter().map(|s| s.content).min().unwrap(),
             3 => subpackets.iter().map(|s| s.content).max().unwrap(),
-            5 => u64::from(subpackets.get(0).unwrap().content > subpackets.get(1).unwrap().content),
-            6 => u64::from(subpackets.get(0).unwrap().content < subpackets.get(1).unwrap().content),
+            5 => {
+                u64::from(subpackets.first().unwrap().content > subpackets.get(1).unwrap().content)
+            }
+            6 => {
+                u64::from(subpackets.first().unwrap().content < subpackets.get(1).unwrap().content)
+            }
             7 => {
-                u64::from(subpackets.get(0).unwrap().content == subpackets.get(1).unwrap().content)
+                u64::from(subpackets.first().unwrap().content == subpackets.get(1).unwrap().content)
             }
             _ => 0,
         };
@@ -86,12 +89,12 @@ impl Packet {
 }
 
 fn parse(input: &str) -> IResult<&str, Packet> {
-    alt((parse_packet_4, parse_packet_not_4))(input)
+    alt((parse_packet_4, parse_packet_not_4)).parse(input)
 }
 
 fn parse_packet_4(input: &str) -> IResult<&str, Packet> {
     let (input, version) = parse_version(input)?;
-    let (input, content) = preceded(tag("100"), parse_literal)(input)?;
+    let (input, content) = preceded(tag("100"), parse_literal).parse(input)?;
 
     let packet = Packet::from_content(version, content);
 
@@ -104,14 +107,14 @@ fn parse_packet_not_4(input: &str) -> IResult<&str, Packet> {
     let (input, length_type_id) = take(1usize)(input)?;
     let (input, subpackets) = if length_type_id == "0" {
         let (input, total_subpacket_length) =
-            map(take(15usize), |tsl| usize::from_str_radix(tsl, 2).unwrap())(input)?;
+            map(take(15usize), |tsl| usize::from_str_radix(tsl, 2).unwrap()).parse(input)?;
         let (input, sub_input) = take(total_subpacket_length)(input)?;
-        let (_, subpackets) = many1(parse)(sub_input)?;
+        let (_, subpackets) = many1(parse).parse(sub_input)?;
         (input, subpackets)
     } else {
         let (input, number_of_subpackets) =
-            map(take(11usize), |tsl| usize::from_str_radix(tsl, 2).unwrap())(input)?;
-        count(parse, number_of_subpackets)(input)?
+            map(take(11usize), |tsl| usize::from_str_radix(tsl, 2).unwrap()).parse(input)?;
+        count(parse, number_of_subpackets).parse(input)?
     };
 
     let packet = Packet::from_subpackets(version, type_id, subpackets);
@@ -128,7 +131,7 @@ fn parse_type_id(input: &str) -> IResult<&str, u8> {
 }
 
 fn parse_three_bits(input: &str) -> IResult<&str, u8> {
-    map(take(3usize), |c: &str| u8::from_str_radix(c, 2).unwrap())(input)
+    map(take(3usize), |c: &str| u8::from_str_radix(c, 2).unwrap()).parse(input)
 }
 
 fn parse_literal(input: &str) -> IResult<&str, u64> {
@@ -139,15 +142,16 @@ fn parse_literal(input: &str) -> IResult<&str, u64> {
             buf.push_str(s);
             u64::from_str_radix(&buf, 2).unwrap()
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_literal_part(input: &str) -> IResult<&str, &str> {
-    map(pair(complete::char('1'), take(4usize)), |(_, b)| b)(input)
+    map(pair(complete::char('1'), take(4usize)), |(_, b)| b).parse(input)
 }
 
 fn parse_literal_end(input: &str) -> IResult<&str, &str> {
-    map(pair(complete::char('0'), take(4usize)), |(_, b)| b)(input)
+    map(pair(complete::char('0'), take(4usize)), |(_, b)| b).parse(input)
 }
 
 fn parse_hex_as_binary(input: &[u8]) -> IResult<&[u8], String> {
@@ -161,11 +165,12 @@ fn parse_hex_as_binary(input: &[u8]) -> IResult<&[u8], String> {
             })
             .collect::<Vec<String>>()
             .join("")
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_arr_as_hex(input: &[u8]) -> IResult<&[u8], &[u8]> {
-    take_while1(is_hex_digit)(input)
+    take_while1(|c: u8| c.is_hex_digit())(input)
 }
 
 fn read_input() -> Result<Packet> {

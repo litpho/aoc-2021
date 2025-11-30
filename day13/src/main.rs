@@ -1,5 +1,3 @@
-use std::{cmp::Ordering, collections::HashSet, fs, io::Read};
-
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
@@ -7,8 +5,9 @@ use nom::{
     combinator::map,
     multi::{count, separated_list1},
     sequence::{preceded, separated_pair},
-    IResult,
+    IResult, Parser,
 };
+use std::{cmp::Ordering, collections::HashSet, fs, io::Read};
 
 fn main() -> Result<()> {
     let (grid, instructions) = read_input()?;
@@ -25,7 +24,7 @@ fn main() -> Result<()> {
 }
 
 fn part_one(grid: Grid, instructions: Vec<Instruction>) -> usize {
-    let grid = grid.fold(instructions.get(0).unwrap());
+    let grid = grid.fold(instructions.first().unwrap());
 
     grid.dots.len()
 }
@@ -118,21 +117,22 @@ impl Instruction {
 }
 
 fn parse(input: &str) -> IResult<&str, (Grid, Vec<Instruction>)> {
-    separated_pair(parse_dots, count(line_ending, 2), parse_instructions)(input)
+    separated_pair(parse_dots, count(line_ending, 2), parse_instructions).parse(input)
 }
 
 fn parse_dots(input: &str) -> IResult<&str, Grid> {
     map(separated_list1(line_ending, parse_dot_line), |dots| {
         Grid::new(dots)
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_dot_line(input: &str) -> IResult<&str, (i16, i16)> {
-    separated_pair(complete::i16, complete::char(','), complete::i16)(input)
+    separated_pair(complete::i16, complete::char(','), complete::i16).parse(input)
 }
 
 fn parse_instructions(input: &str) -> IResult<&str, Vec<Instruction>> {
-    separated_list1(line_ending, parse_instruction_line)(input)
+    separated_list1(line_ending, parse_instruction_line).parse(input)
 }
 
 fn parse_instruction_line(input: &str) -> IResult<&str, Instruction> {
@@ -152,7 +152,8 @@ fn parse_instruction_line(input: &str) -> IResult<&str, Instruction> {
                 location,
             }
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn read_input() -> Result<(Grid, Vec<Instruction>)> {

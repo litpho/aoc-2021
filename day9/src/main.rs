@@ -1,12 +1,14 @@
 use anyhow::Result;
 use nom::{
-    bytes::complete::take_while1, character::complete::line_ending, character::is_digit,
-    combinator::map, multi::separated_list1, IResult,
+    bytes::complete::take_while1, character::complete::line_ending, combinator::map,
+    multi::separated_list1, AsChar, IResult, Parser,
 };
-use std::{cmp::Reverse, fs, io::Read};
+use std::cmp::Reverse;
+
+const DATA: &[u8] = include_bytes!("input.txt");
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {result}");
@@ -114,20 +116,18 @@ fn calculate_neighbours(x: usize, y: usize, max_x: usize, max_y: usize) -> Vec<(
 }
 
 fn parse(input: &[u8]) -> IResult<&[u8], Vec<Vec<u8>>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<u8>> {
-    map(take_while1(is_digit), |line: &[u8]| {
+    map(take_while1(|c: u8| c.is_dec_digit()), |line: &[u8]| {
         line.iter().map(|b| b - 48).collect::<Vec<u8>>()
-    })(input)
+    })
+    .parse(input)
 }
 
-fn read_input() -> Result<Vec<Vec<u8>>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(buf.as_bytes()).expect("Parse failure");
+fn read_input(data: &'static [u8]) -> Result<Vec<Vec<u8>>> {
+    let (_, input) = parse(data)?;
 
     Ok(input)
 }
@@ -136,9 +136,22 @@ fn read_input() -> Result<Vec<Vec<u8>>> {
 mod tests {
     use super::*;
 
+    const TESTDATA: &[u8] = include_bytes!("test.txt");
+
+    #[test]
+    fn test_part_one_testdata() -> Result<()> {
+        let input = read_input(TESTDATA)?;
+
+        let count = part_one(&input);
+
+        assert_eq!(15, count);
+
+        Ok(())
+    }
+
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let count = part_one(&input);
 
@@ -149,9 +162,9 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let mut input = read_input()?;
+        let input = read_input(DATA)?;
 
-        let count = part_two(&mut input);
+        let count = part_two(&input);
 
         assert_eq!(847504, count);
 

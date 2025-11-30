@@ -1,10 +1,3 @@
-use std::{
-    cell::RefCell,
-    fmt::{Display, Formatter},
-    fs,
-    io::Read,
-};
-
 use anyhow::Result;
 use nom::{
     branch::alt,
@@ -12,7 +5,13 @@ use nom::{
     combinator::map,
     multi::separated_list1,
     sequence::{delimited, separated_pair},
-    IResult,
+    IResult, Parser,
+};
+use std::{
+    cell::RefCell,
+    fmt::{Display, Formatter},
+    fs,
+    io::Read,
 };
 
 fn main() -> Result<()> {
@@ -94,7 +93,7 @@ impl Grid {
         let mut result: Vec<Number> = Vec::new();
         let input = self.content.borrow().clone();
         for (i, window) in input.iter().as_slice().windows(2).enumerate() {
-            let first = window.get(0).unwrap();
+            let first = window.first().unwrap();
             let second = window.get(1).unwrap();
             if first.depth >= 4 && second.depth >= 4 && first.depth == second.depth {
                 if i > 0 {
@@ -155,7 +154,7 @@ impl Grid {
         let mut result: Vec<Number> = Vec::new();
         let input = self.content.borrow().clone();
         for (i, window) in input.as_slice().windows(2).enumerate() {
-            let first = window.get(0).unwrap();
+            let first = window.first().unwrap();
             let second = window.get(1).unwrap();
             if first.depth == second.depth {
                 result.append(&mut input.as_slice()[..i].to_vec());
@@ -196,7 +195,7 @@ impl Display for Number {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Vec<Number>>> {
-    separated_list1(line_ending, parse_tuple(0))(input)
+    separated_list1(line_ending, parse_tuple(0)).parse(input)
 }
 
 fn parse_tuple(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Number>> {
@@ -208,7 +207,8 @@ fn parse_tuple(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Number>> {
                 complete::char(']'),
             ),
             |(x, y)| [x, y].concat(),
-        )(input)
+        )
+        .parse(input)
     }
 }
 
@@ -217,7 +217,8 @@ fn parse_value(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Number>> {
         alt((
             parse_tuple(depth + 1),
             map(complete::i16, |value| vec![Number::new(value, depth)]),
-        ))(input)
+        ))
+        .parse(input)
     }
 }
 

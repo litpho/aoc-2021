@@ -1,7 +1,9 @@
 use anyhow::{Error, Result};
 use nom::{
-    character::complete::line_ending, character::complete::one_of, combinator::map, multi::many1,
-    multi::separated_list1, IResult,
+    character::{complete::line_ending, complete::one_of},
+    combinator::map,
+    multi::{many1, separated_list1},
+    IResult, Parser,
 };
 use std::{fs, io::Read};
 
@@ -128,13 +130,14 @@ impl Token {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Vec<Token>>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Vec<Token>> {
     map(many1(one_of("[]{}()<>")), |v: Vec<char>| {
         v.iter().map(|c| Token::new(*c)).collect()
-    })(input)
+    })
+    .parse(input)
 }
 
 fn read_input() -> Result<Vec<Vec<Token>>> {

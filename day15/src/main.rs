@@ -1,7 +1,10 @@
 use anyhow::Result;
 use nom::{
-    bytes::complete::take_while1, character::complete::line_ending, character::is_digit,
-    combinator::map, combinator::map_res, multi::separated_list1, IResult,
+    bytes::complete::take_while1,
+    character::complete::line_ending,
+    combinator::{map, map_res},
+    multi::separated_list1,
+    AsChar, IResult, Parser,
 };
 use pathfinding::prelude::dijkstra;
 
@@ -99,7 +102,7 @@ struct Grid {
 
 impl Grid {
     pub fn new(content: Vec<Vec<i32>>) -> Self {
-        let max_x = content.get(0).unwrap().len() - 1;
+        let max_x = content.first().unwrap().len() - 1;
         let max_y = content.len() - 1;
         Grid {
             content,
@@ -138,15 +141,17 @@ impl Grid {
 fn parse(input: &[u8]) -> IResult<&[u8], Grid> {
     map(separated_list1(line_ending, parse_line), |content| {
         Grid::new(content)
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<i32>> {
-    map_res(take_while1(is_digit), |a: &[u8]| {
+    map_res(take_while1(|c: u8| c.is_dec_digit()), |a: &[u8]| {
         a.iter()
             .map(|c| (c - b'0').to_string().parse::<i32>())
             .collect()
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Grid> {

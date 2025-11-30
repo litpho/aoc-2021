@@ -1,5 +1,3 @@
-use std::{cmp::max, cmp::min, fs, io::Read};
-
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
@@ -7,8 +5,9 @@ use nom::{
     combinator::map,
     multi::separated_list1,
     sequence::separated_pair,
-    IResult, ToUsize,
+    IResult, Parser, ToUsize,
 };
+use std::{cmp::max, cmp::min, fs, io::Read};
 
 fn main() -> Result<()> {
     let lines = read_input()?;
@@ -106,21 +105,23 @@ impl Line {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Line>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Line> {
     map(
         separated_pair(parse_point, tag(" -> "), parse_point),
         |(p1, p2)| Line::new(p1, p2),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_point(input: &str) -> IResult<&str, (usize, usize)> {
     map(
         separated_pair(complete::u32, complete::char(','), complete::u32),
         |(x, y)| (x.to_usize(), y.to_usize()),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn read_input() -> Result<Vec<Line>> {
