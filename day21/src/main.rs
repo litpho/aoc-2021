@@ -6,10 +6,12 @@ use nom::{
     sequence::preceded,
     IResult, Parser,
 };
-use std::{cell::RefCell, cmp::max, fs, io::Read, sync::LazyLock};
+use std::{cell::RefCell, cmp::max, sync::LazyLock};
+
+const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(input.clone()));
     println!("Result part one: {result}");
@@ -215,11 +217,8 @@ fn parse_player(input: &str) -> IResult<&str, u8> {
     .parse(input)
 }
 
-fn read_input() -> Result<Vec<u8>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn read_input(data: &str) -> Result<Vec<u8>> {
+    let (_, input) = parse(data).expect("Parse failure");
 
     Ok(input)
 }
@@ -230,7 +229,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let result = part_one(input);
 
@@ -241,7 +240,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let result = part_two(input);
 

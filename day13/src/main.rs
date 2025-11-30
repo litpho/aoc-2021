@@ -7,10 +7,12 @@ use nom::{
     sequence::{preceded, separated_pair},
     IResult, Parser,
 };
-use std::{cmp::Ordering, collections::HashSet, fs, io::Read};
+use std::{cmp::Ordering, collections::HashSet};
+
+const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let (grid, instructions) = read_input()?;
+    let (grid, instructions) = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(grid.clone(), instructions.clone()));
     println!("Result part one: {result}");
@@ -156,11 +158,8 @@ fn parse_instruction_line(input: &str) -> IResult<&str, Instruction> {
     .parse(input)
 }
 
-fn read_input() -> Result<(Grid, Vec<Instruction>)> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn read_input(data: &str) -> Result<(Grid, Vec<Instruction>)> {
+    let (_, input) = parse(data).expect("Parse failure");
 
     Ok(input)
 }
@@ -171,7 +170,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let (grid, instructions) = read_input()?;
+        let (grid, instructions) = read_input(DATA)?;
 
         let count = part_one(grid, instructions);
 
@@ -182,7 +181,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let (grid, instructions) = read_input()?;
+        let (grid, instructions) = read_input(DATA)?;
 
         let count = part_two(grid, instructions);
 

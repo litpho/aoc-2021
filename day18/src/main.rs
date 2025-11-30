@@ -10,12 +10,12 @@ use nom::{
 use std::{
     cell::RefCell,
     fmt::{Display, Formatter},
-    fs,
-    io::Read,
 };
 
+const DATA: &str = include_str!("input.txt");
+
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(input.clone()));
     println!("Result part one: {result}");
@@ -222,11 +222,8 @@ fn parse_value(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Number>> {
     }
 }
 
-fn read_input() -> Result<Vec<Vec<Number>>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn read_input(data: &str) -> Result<Vec<Vec<Number>>> {
+    let (_, input) = parse(data).expect("Parse failure");
 
     Ok(input)
 }
@@ -237,7 +234,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let result = part_one(input);
 
@@ -248,7 +245,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let result = part_two(input);
 

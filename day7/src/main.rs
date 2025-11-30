@@ -1,10 +1,11 @@
 use anyhow::{Error, Result};
 use itertools::Itertools;
 use nom::{character::complete, multi::separated_list1, IResult, Parser};
-use std::{fs, io::Read};
+
+const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(input.clone()));
     let (position, fuel_spent) = result?;
@@ -60,11 +61,8 @@ fn parse(input: &str) -> IResult<&str, Vec<i32>> {
     separated_list1(complete::char(','), complete::i32).parse(input)
 }
 
-fn read_input() -> Result<Vec<i32>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn read_input(data: &str) -> Result<Vec<i32>> {
+    let (_, input) = parse(data).expect("Parse failure");
 
     Ok(input)
 }
@@ -75,7 +73,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let (position, result) = part_one(input)?;
 
@@ -87,7 +85,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let (position, result) = part_two(input)?;
 

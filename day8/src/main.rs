@@ -7,7 +7,9 @@ use nom::{
     sequence::separated_pair,
     IResult, Parser,
 };
-use std::{cmp::Reverse, collections::HashMap, fs, io::Read, sync::LazyLock};
+use std::{cmp::Reverse, collections::HashMap, sync::LazyLock};
+
+const DATA: &str = include_str!("input.txt");
 
 static BYTEMAP: LazyLock<HashMap<char, u8>> = LazyLock::new(|| {
     HashMap::from([
@@ -22,7 +24,7 @@ static BYTEMAP: LazyLock<HashMap<char, u8>> = LazyLock::new(|| {
 });
 
 fn main() -> Result<()> {
-    let mut input = read_input()?;
+    let mut input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {result}");
@@ -179,11 +181,8 @@ fn parse_group(input: &str) -> IResult<&str, Group> {
     map(alpha1, Group::new).parse(input)
 }
 
-fn read_input() -> Result<Vec<(Groups, Groups)>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn read_input(data: &str) -> Result<Vec<(Groups, Groups)>> {
+    let (_, input) = parse(data).expect("Parse failure");
 
     Ok(input)
 }
@@ -194,7 +193,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let count = part_one(&input);
 
@@ -205,7 +204,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let mut input = read_input()?;
+        let mut input = read_input(DATA)?;
 
         let count = part_two(&mut input);
 

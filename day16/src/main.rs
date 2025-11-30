@@ -8,10 +8,11 @@ use nom::{
     sequence::{pair, preceded},
     AsChar, IResult, Parser,
 };
-use std::{fs, io::Read};
+
+const DATA: &[u8] = include_bytes!("input.txt");
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {result}");
@@ -173,11 +174,8 @@ fn parse_arr_as_hex(input: &[u8]) -> IResult<&[u8], &[u8]> {
     take_while1(|c: u8| c.is_hex_digit())(input)
 }
 
-fn read_input() -> Result<Packet> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse_hex_as_binary(buf.as_bytes()).expect("Parse hex failure");
+fn read_input(data: &[u8]) -> Result<Packet> {
+    let (_, input) = parse_hex_as_binary(data).expect("Parse hex failure");
     let (_, input) = parse(input.as_str()).expect("Parse failure");
 
     Ok(input)
@@ -189,7 +187,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let result = part_one(&input);
 
@@ -200,7 +198,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let result = part_two(&input);
 

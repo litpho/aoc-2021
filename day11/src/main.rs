@@ -3,16 +3,17 @@ use nom::{
     bytes::complete::take_while1, character::complete::line_ending, combinator::map,
     combinator::map_res, multi::separated_list1, AsChar, IResult, Parser,
 };
-use std::{fs, io::Read};
+
+const DATA: &[u8] = include_bytes!("input.txt");
 
 fn main() -> Result<()> {
-    let mut input = read_input()?;
+    let mut input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(&mut input));
     println!("Result part one: {result}");
     println!("Time spent: {took}");
 
-    let mut input = read_input()?;
+    let mut input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_two(&mut input));
     println!("Result part two: {result}");
@@ -155,11 +156,8 @@ fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<i32>> {
     .parse(input)
 }
 
-fn read_input() -> Result<Grid> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(buf.as_bytes()).expect("Parse failure");
+fn read_input(data: &[u8]) -> Result<Grid> {
+    let (_, input) = parse(data).expect("Parse failure");
 
     Ok(input)
 }
@@ -170,7 +168,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let mut input = read_input()?;
+        let mut input = read_input(DATA)?;
 
         let count = part_one(&mut input);
 
@@ -181,7 +179,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let mut input = read_input()?;
+        let mut input = read_input(DATA)?;
 
         let count = part_two(&mut input);
 

@@ -1,9 +1,11 @@
 use anyhow::Result;
 use nom::{character::complete, multi::separated_list1, IResult, Parser};
-use std::{collections::HashMap, fs, io::Read};
+use std::collections::HashMap;
+
+const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(input.clone()));
     println!("Result part one: {result}");
@@ -48,11 +50,8 @@ fn parse(input: &str) -> IResult<&str, Vec<i8>> {
     separated_list1(complete::char(','), complete::i8).parse(input)
 }
 
-fn read_input() -> Result<HashMap<i8, i64>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn read_input(data: &str) -> Result<HashMap<i8, i64>> {
+    let (_, input) = parse(data).expect("Parse failure");
     let mut map: HashMap<i8, i64> = HashMap::new();
     for fish in input {
         *map.entry(fish).or_insert(0) += 1;
@@ -67,7 +66,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let count = part_one(input);
 
@@ -78,7 +77,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let count = part_two(input);
 

@@ -7,10 +7,12 @@ use nom::{
     sequence::separated_pair,
     IResult, Parser,
 };
-use std::{collections::HashMap, fs, io::Read};
+use std::collections::HashMap;
+
+const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {result}");
@@ -136,11 +138,8 @@ fn parse_insertion_rule(input: &str) -> IResult<&str, (&str, &str)> {
     separated_pair(alpha1, tag(" -> "), alpha1).parse(input)
 }
 
-fn read_input() -> Result<Input> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn read_input(data: &str) -> Result<Input> {
+    let (_, input) = parse(data).expect("Parse failure");
 
     Ok(input)
 }
@@ -151,7 +150,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let count = part_one(&input);
 
@@ -162,7 +161,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+        let input = read_input(DATA)?;
 
         let count = part_two(&input);
 

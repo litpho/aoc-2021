@@ -7,10 +7,12 @@ use nom::{
     sequence::separated_pair,
     IResult, Parser, ToUsize,
 };
-use std::{cmp::max, cmp::min, fs, io::Read};
+use std::{cmp::max, cmp::min};
+
+const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let lines = read_input()?;
+    let lines = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(&lines));
     println!("Result part one: {result}");
@@ -124,11 +126,8 @@ fn parse_point(input: &str) -> IResult<&str, (usize, usize)> {
     .parse(input)
 }
 
-fn read_input() -> Result<Vec<Line>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, input) = parse(&buf).expect("Parse failure");
+fn read_input(data: &str) -> Result<Vec<Line>> {
+    let (_, input) = parse(data).expect("Parse failure");
 
     Ok(input)
 }
@@ -139,7 +138,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let lines = read_input()?;
+        let lines = read_input(DATA)?;
 
         let count = part_one(&lines);
 
@@ -150,7 +149,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let lines = read_input()?;
+        let lines = read_input(DATA)?;
 
         let count = part_two(&lines);
 

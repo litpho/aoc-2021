@@ -6,10 +6,12 @@ use nom::{
     sequence::separated_pair,
     IResult, Parser,
 };
-use std::{collections::HashSet, fs, io::Read};
+use std::collections::HashSet;
+
+const DATA: &[u8] = include_bytes!("input.txt");
 
 fn main() -> Result<()> {
-    let (key, grid) = read_input()?;
+    let (key, grid) = read_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(key.clone(), grid.clone()));
     println!("Result part one: {result}");
@@ -146,11 +148,8 @@ fn parse_image(input: &[u8]) -> IResult<&[u8], Grid> {
     .parse(input)
 }
 
-fn read_input() -> Result<(Vec<bool>, Grid)> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
-
-    let (_, (key, grid)) = parse(buf.as_bytes()).expect("Parse failure");
+fn read_input(data: &[u8]) -> Result<(Vec<bool>, Grid)> {
+    let (_, (key, grid)) = parse(data).expect("Parse failure");
 
     Ok((key, grid))
 }
@@ -161,7 +160,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let (key, grid) = read_input()?;
+        let (key, grid) = read_input(DATA)?;
 
         let result = part_one(key, grid);
 
@@ -172,7 +171,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let (key, grid) = read_input()?;
+        let (key, grid) = read_input(DATA)?;
 
         let result = part_two(key, grid);
 
