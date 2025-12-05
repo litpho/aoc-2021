@@ -238,7 +238,7 @@ mod tests {
 
         let result = part_one(input);
 
-        assert_eq!(4176, result);
+        assert_eq!(result, 4176);
 
         Ok(())
     }
@@ -249,7 +249,7 @@ mod tests {
 
         let result = part_two(input);
 
-        assert_eq!(4633, result);
+        assert_eq!(result, 4633);
 
         Ok(())
     }

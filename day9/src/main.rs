@@ -144,7 +144,7 @@ mod tests {
 
         let count = part_one(&input);
 
-        assert_eq!(15, count);
+        assert_eq!(count, 15);
 
         Ok(())
     }
@@ -155,7 +155,7 @@ mod tests {
 
         let count = part_one(&input);
 
-        assert_eq!(541, count);
+        assert_eq!(count, 541);
 
         Ok(())
     }
@@ -166,7 +166,7 @@ mod tests {
 
         let count = part_two(&input);
 
-        assert_eq!(847504, count);
+        assert_eq!(count, 847504);
 
         Ok(())
     }

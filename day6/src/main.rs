@@ -70,7 +70,7 @@ mod tests {
 
         let count = part_one(input);
 
-        assert_eq!(362639, count);
+        assert_eq!(count, 362639);
 
         Ok(())
     }
@@ -81,7 +81,7 @@ mod tests {
 
         let count = part_two(input);
 
-        assert_eq!(1639854996917, count);
+        assert_eq!(count, 1639854996917);
 
         Ok(())
     }

@@ -172,7 +172,7 @@ mod tests {
 
         let count = part_one(&mut input);
 
-        assert_eq!(1793, count);
+        assert_eq!(count, 1793);
 
         Ok(())
     }
@@ -183,7 +183,7 @@ mod tests {
 
         let count = part_two(&mut input);
 
-        assert_eq!(247, count);
+        assert_eq!(count, 247);
 
         Ok(())
     }

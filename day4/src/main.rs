@@ -164,8 +164,8 @@ mod tests {
         let (called_number, card_sum) =
             part_one(&called_numbers, &mut cards).expect("No result found");
 
-        assert_eq!(24, called_number);
-        assert_eq!(188, card_sum);
+        assert_eq!(called_number, 24);
+        assert_eq!(card_sum, 188);
 
         Ok(())
     }
@@ -177,8 +177,8 @@ mod tests {
         let (called_number, card_sum) =
             part_one(&called_numbers, &mut cards).expect("No result found");
 
-        assert_eq!(42, called_number);
-        assert_eq!(782, card_sum);
+        assert_eq!(called_number, 42);
+        assert_eq!(card_sum, 782);
 
         Ok(())
     }
@@ -191,8 +191,8 @@ mod tests {
         let (called_number, card_sum) =
             part_two(&called_numbers, &mut cards).expect("No result found");
 
-        assert_eq!(13, called_number);
-        assert_eq!(148, card_sum);
+        assert_eq!(called_number, 13);
+        assert_eq!(card_sum, 148);
 
         Ok(())
     }
@@ -204,8 +204,8 @@ mod tests {
         let (called_number, card_sum) =
             part_two(&called_numbers, &mut cards).expect("No result found");
 
-        assert_eq!(20, called_number);
-        assert_eq!(246, card_sum);
+        assert_eq!(called_number, 20);
+        assert_eq!(card_sum, 246);
 
         Ok(())
     }

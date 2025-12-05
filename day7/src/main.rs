@@ -77,8 +77,8 @@ mod tests {
 
         let (position, result) = part_one(input)?;
 
-        assert_eq!(354, position);
-        assert_eq!(349812, result);
+        assert_eq!(position, 354);
+        assert_eq!(result, 349812);
 
         Ok(())
     }
@@ -89,8 +89,8 @@ mod tests {
 
         let (position, result) = part_two(input)?;
 
-        assert_eq!(488, position);
-        assert_eq!(99763899, result);
+        assert_eq!(position, 488);
+        assert_eq!(result, 99763899);
 
         Ok(())
     }

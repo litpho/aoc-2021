@@ -134,8 +134,8 @@ mod tests {
     fn test_part_one_testdata() -> Result<()> {
         let (gamma, epsilon) = part_one(&parse_input(TESTDATA)?)?;
 
-        assert_eq!(22, gamma);
-        assert_eq!(9, epsilon);
+        assert_eq!(gamma, 22);
+        assert_eq!(epsilon, 9);
 
         Ok(())
     }
@@ -144,8 +144,8 @@ mod tests {
     fn test_part_one() -> Result<()> {
         let (gamma, epsilon) = part_one(&parse_input(DATA)?)?;
 
-        assert_eq!(1491, gamma);
-        assert_eq!(2604, epsilon);
+        assert_eq!(gamma, 1491);
+        assert_eq!(epsilon, 2604);
 
         Ok(())
     }
@@ -154,8 +154,8 @@ mod tests {
     fn test_part_two_testdata() -> Result<()> {
         let (oxygen, co2) = part_two(parse_input(TESTDATA)?)?;
 
-        assert_eq!(23, oxygen);
-        assert_eq!(10, co2);
+        assert_eq!(oxygen, 23);
+        assert_eq!(co2, 10);
 
         Ok(())
     }
@@ -164,8 +164,8 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let (oxygen, co2) = part_two(parse_input(DATA)?)?;
 
-        assert_eq!(1305, oxygen);
-        assert_eq!(2594, co2);
+        assert_eq!(oxygen, 1305);
+        assert_eq!(co2, 2594);
 
         Ok(())
     }

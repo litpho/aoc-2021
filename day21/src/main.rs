@@ -233,7 +233,7 @@ mod tests {
 
         let result = part_one(input);
 
-        assert_eq!(893700, result);
+        assert_eq!(result, 893700);
 
         Ok(())
     }
@@ -244,7 +244,7 @@ mod tests {
 
         let result = part_two(input);
 
-        assert_eq!(568867175661958, result);
+        assert_eq!(result, 568867175661958);
 
         Ok(())
     }

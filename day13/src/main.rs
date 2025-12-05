@@ -174,7 +174,7 @@ mod tests {
 
         let count = part_one(grid, instructions);
 
-        assert_eq!(814, count);
+        assert_eq!(count, 814);
 
         Ok(())
     }
@@ -186,7 +186,7 @@ mod tests {
         let count = part_two(grid, instructions);
 
         // PZEHRAER
-        assert_eq!(108, count);
+        assert_eq!(count, 108);
 
         Ok(())
     }

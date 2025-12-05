@@ -102,8 +102,8 @@ mod tests {
     fn test_part_one_testdata() -> Result<()> {
         let (x, depth) = part_one(&parse_input(TESTDATA)?);
 
-        assert_eq!(15, x);
-        assert_eq!(10, depth);
+        assert_eq!(x, 15);
+        assert_eq!(depth, 10);
 
         Ok(())
     }
@@ -112,8 +112,8 @@ mod tests {
     fn test_part_one() -> Result<()> {
         let (x, depth) = part_one(&parse_input(DATA)?);
 
-        assert_eq!(1967, x);
-        assert_eq!(1031, depth);
+        assert_eq!(x, 1967);
+        assert_eq!(depth, 1031);
 
         Ok(())
     }
@@ -122,8 +122,8 @@ mod tests {
     fn test_part_two_testdata() -> Result<()> {
         let (x, depth) = part_two(&parse_input(TESTDATA)?);
 
-        assert_eq!(15, x);
-        assert_eq!(60, depth);
+        assert_eq!(x, 15);
+        assert_eq!(depth, 60);
 
         Ok(())
     }
@@ -132,8 +132,8 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let (x, depth) = part_two(&parse_input(DATA)?);
 
-        assert_eq!(1967, x);
-        assert_eq!(967791, depth);
+        assert_eq!(x, 1967);
+        assert_eq!(depth, 967791);
 
         Ok(())
     }

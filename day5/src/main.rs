@@ -142,7 +142,7 @@ mod tests {
 
         let count = part_one(&lines);
 
-        assert_eq!(7142, count);
+        assert_eq!(count, 7142);
 
         Ok(())
     }
@@ -153,7 +153,7 @@ mod tests {
 
         let count = part_two(&lines);
 
-        assert_eq!(20012, count);
+        assert_eq!(count, 20012);
 
         Ok(())
     }

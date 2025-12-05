@@ -164,7 +164,7 @@ mod tests {
 
         let result = part_one(key, grid);
 
-        assert_eq!(5765, result);
+        assert_eq!(result, 5765);
 
         Ok(())
     }
@@ -175,7 +175,7 @@ mod tests {
 
         let result = part_two(key, grid);
 
-        assert_eq!(18509, result);
+        assert_eq!(result, 18509);
 
         Ok(())
     }
